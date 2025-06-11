@@ -9,19 +9,19 @@ Option Explicit
 ' Configuration Block
 '========================
 ' LM Studio configuration
-Public Const API_ENDPOINT = "http://192.168.20.158:1234/v1/chat/completions"
-Public Const API_KEY = ""           ' Leave blank for LM Studio; fill for OpenAI
-Public Const DEFAULT_MODEL = "mistral-small-3.1-24b-instruct-2503"
-Public Const HTTP_TIMEOUTMS = 30000 ' Timeout in milliseconds
+'Public Const API_ENDPOINT = "http://localhost:1234/v1/chat/completions"
+'Public Const API_KEY = ""           ' Leave blank for LM Studio; fill for OpenAI
+'Public Const DEFAULT_MODEL = "mistral-small-3.1-24b-instruct-2503"
+'Public Const HTTP_TIMEOUTMS = 30000 ' Timeout in milliseconds
 
 ' Updated: Automatic update interval - changed to 2 seconds
 Public Const AUTO_UPDATE_INTERVAL_SECONDS = 2 ' Update interval in seconds
 
 ' Uncomment the block below to switch to OpenRouter:
-'Public Const API_ENDPOINT = "https://openrouter.ai/api/v1/chat/completions"
-'Public Const API_KEY = "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"
-'Public Const DEFAULT_MODEL = "gpt-4.1-nano"
-'Public Const HTTP_TIMEOUTMS = 30000
+Public Const API_ENDPOINT = "https://openrouter.ai/api/v1/chat/completions"
+Public Const API_KEY = "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"
+Public Const DEFAULT_MODEL = "gpt-4.1-nano"
+Public Const HTTP_TIMEOUTMS = 30000
 
 '========================
 ' Module Variables
