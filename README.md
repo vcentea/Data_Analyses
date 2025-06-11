@@ -42,14 +42,14 @@ Edit the configuration block in the script:
 
 ```vba
 ' LM Studio (Local)
-Public Const API_ENDPOINT = "http://192.168.20.158:1234/v1/chat/completions"
+Public Const API_ENDPOINT = "http://localhost:1234/v1/chat/completions"
 Public Const API_KEY = ""  ' Leave blank for LM Studio
 Public Const DEFAULT_MODEL = "mistral-small-3.1-24b-instruct-2503"
 
 ' OR OpenAI (Cloud)
 'Public Const API_ENDPOINT = "https://api.openai.com/v1/chat/completions"
 'Public Const API_KEY = "your-openai-api-key"
-'Public Const DEFAULT_MODEL = "gpt-4"
+'Public Const DEFAULT_MODEL = "gpt-4o-mini"
 ```
 
 ### 3. Initialize Control Panel
@@ -61,8 +61,8 @@ Public Const DEFAULT_MODEL = "mistral-small-3.1-24b-instruct-2503"
 ### Basic LLM Function
 ```excel
 =LLM("What is the capital of France?")
-=LLM("Analyze this data", 0.7)
-=LLM("Generate creative content", 0.9, "gpt-4")
+=LLM("Analyze this data", 0.2)
+=LLM("Generate creative content", 0.2, "gpt-4o-mini")
 ```
 
 ### Function Parameters
