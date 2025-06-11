@@ -227,6 +227,27 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 - Regularly rotate API keys
 - Monitor API usage for unexpected spikes
 
+## 🧹 Clear Function
+
+### Purpose
+The `Clear` function allows you to reset or clear the API call counter and cache, providing a fresh start without reloading the workbook or running the full setup.
+
+### Syntax
+```vba
+Clear()
+```
+
+### Usage Example
+- Run the macro from the VBA editor or assign it to a button:
+  1. Press `Alt + F8` in Excel
+  2. Select `Clear` from the macro list
+  3. Click `Run`
+
+### What It Does
+- Resets the API call counter to 0
+- Clears the in-memory cache (if implemented)
+- Leaves all configuration and control panel settings intact
+
 ---
 
 **Created with ❤️ for seamless Excel-LLM integration**
