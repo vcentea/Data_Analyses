@@ -70,6 +70,102 @@ Public Const DEFAULT_MODEL = "mistral-small-3.1-24b-instruct-2503"
 - **temperature** (optional): Creativity level (0.0-1.0, default: 0.1)
 - **model** (optional): Specific model to use (default: configured model)
 
+## 🔧 LLM Function Reference
+
+### Complete Syntax
+```vba
+LLM(prompt, [temperature], [model])
+```
+
+### Parameters Detailed
+
+#### `prompt` (String, Required)
+- **Description**: The question, instruction, or text you want the AI to process
+- **Examples**: 
+  - `"What is the capital of France?"`
+  - `"Summarize this data in bullet points"`
+  - `"Translate 'Hello World' to Spanish"`
+- **Best Practices**: 
+  - Be specific and clear
+  - Use consistent phrasing for cache hits
+  - Include context when needed
+
+#### `temperature` (Double, Optional)
+- **Description**: Controls the creativity/randomness of the AI response
+- **Range**: 0.0 to 1.0
+- **Default**: 0.1
+- **Guidelines**:
+  - `0.0 - 0.2`: Deterministic, factual responses (recommended for data analysis)
+  - `0.3 - 0.5`: Balanced creativity and consistency
+  - `0.6 - 0.8`: More creative and varied responses
+  - `0.9 - 1.0`: Highly creative, unpredictable (use sparingly)
+
+#### `model` (String, Optional)
+- **Description**: Specify which AI model to use for this request
+- **Default**: Uses the configured `DEFAULT_MODEL` constant
+- **Examples**:
+  - `"gpt-4o-mini"` (OpenAI)
+  - `"mistral-small-3.1-24b-instruct-2503"` (LM Studio)
+  - `"claude-3-sonnet"` (Anthropic via OpenRouter)
+
+### Usage Examples by Scenario
+
+#### Data Analysis
+```excel
+=LLM("Analyze the trend in cell range A1:A10", 0.1)
+=LLM("What insights can you provide about this sales data?", 0.2)
+```
+
+#### Text Processing
+```excel
+=LLM("Summarize this paragraph: " & A1, 0.1)
+=LLM("Extract key points from: " & B2, 0.2)
+```
+
+#### Creative Tasks
+```excel
+=LLM("Write a creative product description for: " & C1, 0.7)
+=LLM("Generate 3 marketing slogans for: " & D1, 0.8)
+```
+
+#### Model-Specific Requests
+```excel
+=LLM("Explain quantum physics simply", 0.1, "gpt-4o-mini")
+=LLM("Write a poem about data", 0.9, "claude-3-sonnet")
+```
+
+### Return Values
+
+#### Successful Response
+- Returns the AI-generated text response
+- Automatically cached for identical requests
+- Handles line breaks and special characters
+
+#### Error Responses
+- `#NO_API (Memory: X unsaved calls)`: API calls disabled or limit reached
+- `#HTTP404: Model not found`: Invalid model specified
+- `#HTTP429: Rate limit exceeded`: Too many requests
+- `#PARSE? (Content not found)`: Invalid API response format
+- `#ERR123: Description`: General error with code and description
+
+### Performance Optimization
+
+#### Cache Usage
+```excel
+' These will use cache after first call
+=LLM("What is 2+2?", 0.1)  ' First call - hits API
+=LLM("What is 2+2?", 0.1)  ' Second call - uses cache
+```
+
+#### Efficient Prompting
+```excel
+' Good: Specific and reusable
+=LLM("Classify this sentiment as positive/negative/neutral: " & A1, 0.1)
+
+' Avoid: Overly complex single-use prompts
+=LLM("Please analyze the sentiment and also check grammar and provide suggestions for " & A1, 0.3)
+```
+
 ### Control Panel
 
 | Call APIs | TRUE/FALSE | Max Calls | 50 | Current Calls | 0 |
@@ -227,28 +323,7 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 - Regularly rotate API keys
 - Monitor API usage for unexpected spikes
 
-## 🧹 Clear Function
 
-### Purpose
-The `Clear` function allows you to reset or clear the API call counter and cache, providing a fresh start without reloading the workbook or running the full setup.
-
-### Syntax
-```vba
-Clear()
-```
-
-### Usage Example
-- Run the macro from the VBA editor or assign it to a button:
-  1. Press `Alt + F8` in Excel
-  2. Select `Clear` from the macro list
-  3. Click `Run`
-
-### What It Does
-- Resets the API call counter to 0
-- Clears the in-memory cache (if implemented)
-- Leaves all configuration and control panel settings intact
-
----
 
 **Created with ❤️ for seamless Excel-LLM integration**
 
