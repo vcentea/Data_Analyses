@@ -1,0 +1,70 @@
+Generic Examples:
+=LLM("Summarize this paragraph: " & A1)
+=LLM("Analyze the trend in cell range A1:A10"; 0,1)
+=LLM("Explain quantum physics simply"; 0,1; "gpt-4o-mini")
+=LLM("Write a poem about data"; 0,9; "claude-3-sonnet")
+
+
+Template of LLM function for Category Classification
+
+
+
+=LLM(
+"create an AI category for the company. Reply only with the category name and nothing else before or after. Adhere strictly to this. "&
+"Assign one category only from this standardized taxonomy: "&
+"- AI_Development_Tools (APIs, SDKs, development platforms) "&
+"- AI_Models_LLMs (base models, foundation models, model providers) "&
+"- AI_Applications_chatbot (chatbots) "&
+"- AI_Applications_voice (voice agents) "&
+"- AI_Applications_image (image generation) "&
+"- AI_Applications_video (video generation) "&
+"- AI_Applications_other (other specific AI tools) "&
+"- AI_Education (courses, tutorials, learning platforms) "&
+"- AI_Research (papers, academic institutions, research organizations) "&
+"- AI_News_Media (industry news, AI journalism, trend analysis) "&
+"- AI_Infrastructure (cloud platforms, MLOps, deployment tools) "&
+"- AI_Community (forums, social platforms, professional networks) "&
+"- Non_AI_Tech (general tech sites with minimal AI focus) "&
+"- Non_AI_General (completely unrelated to AI): "&
+"site="&  A2; 0,1; "gpt-4.1-nano")
+
+
+Template of LLM function for Description Generation
+
+
+
+=LLM("Create a Website_Description: "&
+"- Provide a concise 15–25 word description covering: primary purpose, target audience, and core value proposition "&
+"- Format: `[Company/Platform] - [What they do] for [target audience] offering [key services/products]` "&
+"When evaluating, the most relevant is the base domain name. So write the first part of description about it" &
+"Then include the subdomain in the evaluation if adds more clarification in the" &
+" context of the domain name. (example: google.com - > tech company " &
+"and gemini.google.com -> AI chatbot service, Foundational model)" &
+"do not put commas ‘,’ in the description" &
+"Reply just with the description and nothing else before or after. Website=" & A3; "0.0"; "perplexity/llama-3.1-sonar-small-128k-online")
+
+Final enrichment PROMPT for category
+We will use both website column and description column
+for classification
+
+
+
+=LLM(
+"create an AI category for the company. Reply only with the category name and nothing else before or after.
+Adhere strictly to this. "&
+"Assign one category only from this standardized taxonomy: "&
+"- AI_Development_Tools (APIs, SDKs, development platforms) "&
+"- AI_Models_LLMs (base models, foundation models, model providers) "&
+"- AI_Applications_chatbot (chatbots) "&
+"- AI_Applications_voice (voice agents) "&
+"- AI_Applications_image (image generation) "&
+"- AI_Applications_video (video generation) "&
+"- AI_Applications_other (other specific AI tools) "&
+"- AI_Education (courses, tutorials, learning platforms) "&
+"- AI_Research (papers, academic institutions, research organizations) "&
+"- AI_News_Media (industry news, AI journalism, trend analysis) "&
+"- AI_Infrastructure (cloud platforms, MLOps, deployment tools) "&
+"- AI_Community` (forums, social platforms, professional networks) "&
+"- Non_AI_Tech (general tech sites with minimal AI focus) "&
+"- Non_AI_General (completely unrelated to AI): "&
+"site='"&  A299 &"' description='" & E299&"'"; 0,1; "openai/gpt-4.1-nano") 

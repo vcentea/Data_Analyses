@@ -1,0 +1,17 @@
+# TASK: Restructure the data
+## OBJECTIVE  
+Create a new dataset using the input dataset. Make sure you are processing all the records in the input dataset. The new dataset will allow us to count the
+number or interactions for each website and the number of distinct days each website was accessed
+# INPUT DATA STRUCTURE
+  - format CSV
+  - timestamp column
+  - website column
+## DATA PROCESSING RULES   
+- For each website we will have just one row
+- For each website we will count the number of interactions which is equal with the number of timestamps
+- For each website we will count the number of distinct days it appears in the dataset using the timestamp
+## OUTPUT FORMAT   
+- CSV - output as file
+ -website column
+ -number of interactions column
+ -number of days column 

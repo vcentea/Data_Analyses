@@ -1,0 +1,16 @@
+# TASK: Remove irrelevant data from our dataset
+## OBJECTIVE  
+Create a full dataset without the irrelevant data without skipping any row
+# INPUT DATA STRUCTURE
+  - format CSV
+  - timestamp column
+  - URL column
+  - Page description column 
+## DATA PROCESSING RULES  
+- Leave the first column as is
+- on the URL column we want to keep just the full domain name including the subdomain. Remove the "http..." part and the path part after "/" if any.
+- remove the page description column
+## OUTPUT FORMAT  
+- CSV - output as file
+- timestamp column
+- processed URL, reduced as request in the data processing rules (just the domain/subdomain) 

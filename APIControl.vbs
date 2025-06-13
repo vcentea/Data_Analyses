@@ -20,7 +20,7 @@ Public Const AUTO_UPDATE_INTERVAL_SECONDS = 2 ' Update interval in seconds
 ' Uncomment the block below to switch to OpenRouter:
 Public Const API_ENDPOINT = "https://openrouter.ai/api/v1/chat/completions"
 Public Const API_KEY = "your-key-here"
-Public Const DEFAULT_MODEL = "gpt-4.1-nano"
+Public Const DEFAULT_MODEL = "openai/gpt-4o-mini-search-preview"
 Public Const HTTP_TIMEOUTMS = 30000
 
 '========================

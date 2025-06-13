@@ -1,0 +1,47 @@
+# 1. Data enrichment with AI category for each website
+BEFORE YOUR START: 
+ -count the rows to see how many do we have
+ -if there are less than 1000 I know you can do it row by row
+ -do not suggest any other scripting approach because it will not work, there are no patterns 
+ -you have to use your knowledge on each site and based on that to find a category for it
+ -do not suggest scripting and do not be lazy, take a deep breath and work step by step
+ -trust me I would not give you more than 1000 rows, you can start directly
+## 1.1 CRITICAL PROCESSING REQUIREMENTS  
+- Process every single row in the dataset — no exceptions, no sampling, no truncation  
+- Perform analysis using knowledge base only (NO code execution, NO automated scripts)  
+- Return complete enriched dataset with all original rows plus new columns  
+## 1.2 DATA ENRICHMENT SPECIFICATION  
+For each website row, add exactly one column:
+### 1.2.1 Column : "AI_Category"  
+Assign one category only from this standardized taxonomy:
+- `AI_Development_Tools` (APIs, SDKs, development platforms)  
+- `AI_Models_LLMs` (base models, foundation models, model providers)  
+- `AI_Applications_chatbot` (chatbots) 
+- `AI_Applications_voice` ( voice agents) 
+- `AI_Applications_image` (image generation) 
+- `AI_Applications_video` (video generation) 
+- `AI_Applications_other` (other specific AI tools) 
+- `AI_Education` (courses, tutorials, learning platforms)  
+- `AI_Research` (papers, academic institutions, research organizations)  
+- `AI_News_Media` (industry news, AI journalism, trend analysis)  
+- `AI_Infrastructure` (cloud platforms, MLOps, deployment tools)  
+- `AI_Community` (forums, social platforms, professional networks)  
+- `Non_AI_Tech` (general tech sites with minimal AI focus)  
+- `Non_AI_General` (completely unrelated to AI)  
+# 2. QUALITY ASSURANCE PROTOCOL
+## 2.1 Completeness Check  
+- Explicitly state: `"Processed X out of X total rows"` in your response  
+## 2.2 Unknown Sites  
+- If unfamiliar with a website:  
+  - try to use the "web search tool" if available if not then Category = "Unclassified"  
+## 2.4 Consistency  
+- Use exact category names listed above  
+- Do not create new or modified categories  
+# 3. OUTPUT FORMAT
+## 3.1 Final Output Should Include:  
+- All original columns  
+- new column appended as specified  
+- Consistent formatting throughout  
+# 4. VERIFICATION STATEMENT
+- End your response with:  
+  "✓ COMPLETE: Processed [X] total rows with zero omissions" 

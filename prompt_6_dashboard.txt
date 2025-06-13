@@ -1,0 +1,35 @@
+# TASK: Website Interaction Analysis & AI Ecosystem Visualization
+## OBJECTIVE  
+Analyze this CSV file that contains my browser history over the last 3 months, each site having a category attribute. Please identify key AI-related resources,
+understand my research focus areas, my working tools and habits and visualize engagement patterns that reveal insights about my AI learning journey and professional
+interests.
+How to work:
+ - Use all the data given.
+ - First check programmatically all the existing categories to understand the content
+ - Count programmatically the rows
+ - After you know the possible categories, make a plan for the charts how to extract the data for them
+ - Create the charts programmatically for all the data
+### Analysis Charts  
+- Top 15 most-visited AI sites (bar chart)  by: 
+- total interactions 
+- total days  
+- Engagement intensity heatmap (interactions vs. distinct days) to identify deep-dive vs. casual browsing patterns  
+- Site category distribution (pie/donut chart) showing AI subdomain focus areas   (by days)
+- Engagement pattern analysis (high frequency + high day count = core resources)  
+- Time investment distribution across AI categories  
+- Discovery vs. reference pattern identification (low days/high interactions vs. high days/varied interactions)
+-For the AI categories that are used a lot (top 5), list also the websites in the category in a separate chart
+- Add any other chart if you find it useful or insightful given the data we have
+### Site Classification & Categorization  
+- Use existing site categorization but also create overarching categories for high level analyses
+- Identify AI focus areas
+## TECHNICAL REQUIREMENTS  
+- Use modern, professional color schemes (avoid default chart colors)  
+- Implement consistent typography and spacing  
+- Include data labels and clear legends  
+## INPUT DATA
+Attached below browser history statistics
+## OUTPUT FORMAT  
+- Brief executive summary (2–3 sentences) of key findings  
+- Individual chart sections with contextual analysis  
+- Output directly everything in one shot do not ask me anything 

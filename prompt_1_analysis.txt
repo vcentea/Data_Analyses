@@ -1,0 +1,28 @@
+# TASK: Website Interaction Analysis & AI Ecosystem Visualization
+## OBJECTIVE  
+Analyze my browser history over the last 3 months to identify key AI-related resources, understand my research focus areas, and visualize engagement
+patterns that reveal insights about my AI learning journey and professional interests.
+### Analysis Charts  
+- Top 15 most-visited AI sites (bar chart)  by: 
+- total interactions 
+- total days  
+- Engagement intensity heatmap (interactions vs. distinct days) to identify deep-dive vs. casual browsing patterns  
+- Site category distribution (pie/donut chart) showing AI subdomain focus areas   (by days)
+- Engagement pattern analysis (high frequency + high day count = core resources)  
+- Time investment distribution across AI categories  
+- Discovery vs. reference pattern identification (low days/high interactions vs. high days/varied interactions)
+- Add any other chart if you find it useful or insightful given the data we have
+### Site Classification & Categorization  
+- Classify sites into categories 
+- Identify AI focus areas
+- Flag any non-AI sites for context  
+## TECHNICAL REQUIREMENTS  
+- Use modern, professional color schemes (avoid default chart colors)  
+- Implement consistent typography and spacing  
+- Include data labels and clear legends  
+## INPUT DATA
+Attached below browser history statistics
+## OUTPUT FORMAT  
+- Brief executive summary (2–3 sentences) of key findings  
+- Individual chart sections with contextual analysis  
+- Output directly everything in one shot do not ask me anything 
