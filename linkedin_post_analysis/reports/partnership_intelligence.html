@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Partnership Intelligence Report</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+            line-height: 1.6;
+        }
+        .header {
+            text-align: center;
+            background: linear-gradient(135deg, #2E86AB, #A23B72);
+            color: white;
+            padding: 40px;
+            margin: -20px -20px 30px -20px;
+            border-radius: 0 0 15px 15px;
+        }
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            border-left: 5px solid #2E86AB;
+        }
+        .score {
+            font-size: 36px;
+            font-weight: bold;
+            color: #2E86AB;
+            margin: 10px 0;
+        }
+        .chart-container {
+            background: white;
+            margin: 30px 0;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .insights {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            padding: 30px;
+            margin: 30px 0;
+            border-radius: 15px;
+            border-left: 5px solid #28a745;
+        }
+        .insight-section {
+            margin: 20px 0;
+        }
+        .strength {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .development {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .recommendation {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #ffc107;
+            margin: 10px 0;
+        }
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🤝 Partnership Intelligence Report</h1>
+        <h2>Strategic Compatibility & Collaboration Assessment</h2>
+        <p>Comprehensive analysis of partnership readiness and strategic alignment capabilities</p>
+    </div>
+    
+    <div class="summary-cards">
+        <div class="card">
+            <h3>Overall Partnership Score</h3>
+            <div class="score">3.7/5.0</div>
+            <p><strong>Good</strong> Partnership Readiness</p>
+        </div>
+        <div class="card">
+            <h3>Top Strength</h3>
+            <div class="score">4.4</div>
+            <p><strong>Reliability</strong></p>
+        </div>
+        <div class="card">
+            <h3>Development Priority</h3>
+            <div class="score">3.0</div>
+            <p><strong>Leadership</strong></p>
+        </div>
+        <div class="card">
+            <h3>Partnership Risk Level</h3>
+            <div class="score">Medium</div>
+            <p>Based on overall assessment</p>
+        </div>
+    </div>
+    
+    <div class="legend">
+        <div class="legend-item">
+            <div class="legend-color" style="background-color: #2E8B57;"></div>
+            <span>Excellent (4.0+ for most skills)</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background-color: #FFD700;"></div>
+            <span>Good (3.0-3.9 for most skills)</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background-color: #FF6B6B;"></div>
+            <span>Needs Development (Below 3.0)</span>
+        </div>
+    </div>
+    
+    <div class="chart-container">
+        <div id="partnership-dashboard"></div>
+    </div>
+    
+    <div class="insights">
+        <h3>🎯 Partnership Intelligence Insights</h3>
+        
+        <div class="insight-section">
+            <h4>Key Strengths:</h4>
+            <ul>
+                <li class='strength'>Adaptability: Excellent partnership asset</li><li class='strength'>Strategic Thinking: Excellent partnership asset</li>
+            </ul>
+        </div>
+        
+        <div class="insight-section">
+            <h4>Development Areas:</h4>
+            <ul>
+                <li>All skills are at good or excellent levels</li>
+            </ul>
+        </div>
+        
+        <div class="insight-section">
+            <h4>Strategic Recommendations:</h4>
+            <div class="recommendation">
+                <strong>Partnership Strategy:</strong> 
+                Leverage your strong partnership skills to build strategic alliances. Focus on partnerships where your strengths complement others' capabilities.
+            </div>
+            <div class="recommendation">
+                <strong>Risk Management:</strong> 
+                Your balanced risk profile makes you suitable for diverse partnership types. Consider both conservative and growth-oriented partnerships.
+            </div>
+            <div class="recommendation">
+                <strong>Leadership Role:</strong> 
+                Consider developing leadership skills to enhance your partnership effectiveness and influence.
+            </div>
+        </div>
+        
+        <div class="insight-section">
+            <h4>Partnership Readiness Matrix Interpretation:</h4>
+            <p><strong>Your Position:</strong> 
+            High Collaboration + High Leadership = Ideal partnership leader
+            </p>
+        </div>
+    </div>
+    
+    <script>
+        var plotData = {"data":[{"marker":{"color":["#FFD700","#FFD700","#FFD700","#2E8B57","#FFD700","#2E8B57","#FFD700"]},"name":"Your Scores","text":["3.7","4.4","3.1","4.2","3.3","4.3","3.0"],"textposition":"outside","x":["Integrity Trust","Reliability","Collaboration","Adaptability","Risk Tolerance","Strategic Thinking","Leadership"],"y":[3.73,4.4,3.068,4.214,3.3,4.298,3.044],"type":"bar","xaxis":"x","yaxis":"y"},{"marker":{"color":"green","size":12,"symbol":"diamond"},"mode":"markers","name":"Excellent","showlegend":true,"x":[4.5],"y":[0],"type":"scatter","xaxis":"x2","yaxis":"y2"},{"marker":{"color":"gold","size":10,"symbol":"circle"},"mode":"markers","name":"Good","showlegend":true,"x":[3.5],"y":[0],"type":"scatter","xaxis":"x2","yaxis":"y2"},{"marker":{"color":"blue","size":14,"symbol":"star"},"mode":"markers","name":"Your Score","showlegend":true,"x":[3.73],"y":[0],"type":"scatter","xaxis":"x2","yaxis":"y2"},{"marker":{"color":"green","size":12,"symbol":"diamond"},"mode":"markers","name":"","showlegend":false,"x":[4.5],"y":[1],"type":"scatter","xaxis":"x2","yaxis":"y2"},{"marker":{"color":"gold","size":10,"symbol":"circle"},"mode":"markers","name":"","showlegend":false,"x":[3.5],"y":[1],"type":"scatter","xaxis":"x2","yaxis":"y2"},{"marker":{"color":"blue","size":14,"symbol":"star"},"mode":"markers","name":"","showlegend":false,"x":[4.4],"y":[1],"type":"scatter","xaxis":"x2","yaxis":"y2"},{"marker":{"color":"green","size":12,"symbol":"diamond"},"mode":"markers","name":"","showlegend":false,"x":[4.0],"y":[2],"type":"scatter","xaxis":"x2","yaxis":"y2"},{"marker":{"color":"gold","size":10,"symbol":"circle"},"mode":"markers","name":"","showlegend":false,"x":[3.0],"y":[2],"type":"scatter","xaxis":"x2","yaxis":"y2"},{"marker":{"color":"blue","size":14,"symbol":"star"},"mode":"markers","name":"","showlegend":false,"x":[3.068],"y":[2],"type":"scatter","xaxis":"x2","yaxis":"y2"},{"marker":{"color":"green","size":12,"symbol":"diamond"},"mode":"markers","name":"","showlegend":false,"x":[4.0],"y":[3],"type":"scatter","xaxis":"x2","yaxis":"y2"},{"marker":{"color":"gold","size":10,"symbol":"circle"},"mode":"markers","name":"","showlegend":false,"x":[3.0],"y":[3],"type":"scatter","xaxis":"x2","yaxis":"y2"},{"marker":{"color":"blue","size":14,"symbol":"star"},"mode":"markers","name":"","showlegend":false,"x":[4.214],"y":[3],"type":"scatter","xaxis":"x2","yaxis":"y2"},{"marker":{"color":"green","size":12,"symbol":"diamond"},"mode":"markers","name":"","showlegend":false,"x":[3.5],"y":[4],"type":"scatter","xaxis":"x2","yaxis":"y2"},{"marker":{"color":"gold","size":10,"symbol":"circle"},"mode":"markers","name":"","showlegend":false,"x":[2.5],"y":[4],"type":"scatter","xaxis":"x2","yaxis":"y2"},{"marker":{"color":"blue","size":14,"symbol":"star"},"mode":"markers","name":"","showlegend":false,"x":[3.3],"y":[4],"type":"scatter","xaxis":"x2","yaxis":"y2"},{"marker":{"color":"green","size":12,"symbol":"diamond"},"mode":"markers","name":"","showlegend":false,"x":[4.0],"y":[5],"type":"scatter","xaxis":"x2","yaxis":"y2"},{"marker":{"color":"gold","size":10,"symbol":"circle"},"mode":"markers","name":"","showlegend":false,"x":[3.0],"y":[5],"type":"scatter","xaxis":"x2","yaxis":"y2"},{"marker":{"color":"blue","size":14,"symbol":"star"},"mode":"markers","name":"","showlegend":false,"x":[4.298],"y":[5],"type":"scatter","xaxis":"x2","yaxis":"y2"},{"marker":{"color":"green","size":12,"symbol":"diamond"},"mode":"markers","name":"","showlegend":false,"x":[4.0],"y":[6],"type":"scatter","xaxis":"x2","yaxis":"y2"},{"marker":{"color":"gold","size":10,"symbol":"circle"},"mode":"markers","name":"","showlegend":false,"x":[3.0],"y":[6],"type":"scatter","xaxis":"x2","yaxis":"y2"},{"marker":{"color":"blue","size":14,"symbol":"star"},"mode":"markers","name":"","showlegend":false,"x":[3.044],"y":[6],"type":"scatter","xaxis":"x2","yaxis":"y2"},{"marker":{"color":"red","size":20},"mode":"markers+text","name":"Your Position","text":["YOU"],"textposition":"middle center","x":[3.068],"y":[3.044],"type":"scatter","xaxis":"x3","yaxis":"y3"},{"marker":{"color":["lightblue","darkblue","lightblue"]},"name":"Risk Profile","x":["Conservative","Balanced","Aggressive"],"y":[2.0,3.0,4.0],"type":"bar","xaxis":"x4","yaxis":"y4"}],"layout":{"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmapgl":[{"type":"heatmapgl","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"xaxis":{"anchor":"y","domain":[0.0,0.45],"title":{"text":"Partnership Skills"}},"yaxis":{"anchor":"x","domain":[0.625,1.0],"title":{"text":"Score (1-5)"},"range":[0,5]},"xaxis2":{"anchor":"y2","domain":[0.55,1.0],"title":{"text":"Score (1-5)"},"range":[0,5]},"yaxis2":{"anchor":"x2","domain":[0.625,1.0],"title":{"text":"Skills"},"ticktext":["Integrity Trust","Reliability","Collaboration","Adaptability","Risk Tolerance","Strategic Thinking","Leadership"],"tickvals":[0,1,2,3,4,5,6]},"xaxis3":{"anchor":"y3","domain":[0.0,0.45],"title":{"text":"Collaboration Skills"},"range":[0,5]},"yaxis3":{"anchor":"x3","domain":[0.0,0.375],"title":{"text":"Leadership Skills"},"range":[0,5]},"xaxis4":{"anchor":"y4","domain":[0.55,1.0],"title":{"text":"Risk Profile"}},"yaxis4":{"anchor":"x4","domain":[0.0,0.375],"title":{"text":"Preference Level"}},"annotations":[{"font":{"size":16},"showarrow":false,"text":"Partnership Skills Assessment","x":0.225,"xanchor":"center","xref":"paper","y":1.0,"yanchor":"bottom","yref":"paper"},{"font":{"size":16},"showarrow":false,"text":"Skills vs Industry Benchmarks","x":0.775,"xanchor":"center","xref":"paper","y":1.0,"yanchor":"bottom","yref":"paper"},{"font":{"size":16},"showarrow":false,"text":"Partnership Readiness Matrix","x":0.225,"xanchor":"center","xref":"paper","y":0.375,"yanchor":"bottom","yref":"paper"},{"font":{"size":16},"showarrow":false,"text":"Risk-Reward Profile","x":0.775,"xanchor":"center","xref":"paper","y":0.375,"yanchor":"bottom","yref":"paper"}],"shapes":[{"line":{"color":"gray","dash":"dash"},"type":"line","x0":0,"x1":1,"xref":"x3 domain","y0":3.0,"y1":3.0,"yref":"y3"},{"line":{"color":"gray","dash":"dash"},"type":"line","x0":3.0,"x1":3.0,"xref":"x3","y0":0,"y1":1,"yref":"y3 domain"}],"title":{"font":{"size":24},"text":"Partnership Intelligence Dashboard","x":0.5},"height":800,"showlegend":true}};
+        Plotly.newPlot('partnership-dashboard', plotData.data, plotData.layout, {responsive: true});
+    </script>
+</body>
+</html>

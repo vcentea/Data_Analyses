@@ -1,0 +1,24 @@
+# LinkedIn Post Analysis - Python Dependencies
+# Core data processing
+pandas>=2.0.0
+numpy>=1.24.0
+openpyxl>=3.1.0
+
+# Visualization
+plotly>=5.17.0
+
+# Machine Learning
+scikit-learn>=1.3.0
+scipy>=1.11.0
+
+# HTTP requests for LLM API
+requests>=2.31.0
+
+# Optional: Jupyter for interactive analysis
+jupyter>=1.0.0
+notebook>=7.0.0
+
+# Development tools
+pytest>=7.4.0
+black>=23.0.0
+flake8>=6.0.0 
