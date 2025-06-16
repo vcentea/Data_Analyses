@@ -274,10 +274,10 @@ def create_skill_complementarity_matrix(complementarity_matrix, topics):
     
     return fig
 
-def generate_content_trait_nexus():
+def generate_content_trait_nexus(data_file: str = None):
     """Generate complete content-trait nexus analysis"""
     print("Loading data for content-trait nexus analysis...")
-    df = load_and_merge_data()
+    df = load_and_merge_data(data_file)
     
     print("Analyzing topic-trait relationships...")
     topic_trait_correlations, topic_trait_averages, all_topics = analyze_topic_trait_relationships(df)

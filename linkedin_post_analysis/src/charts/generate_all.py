@@ -8,44 +8,84 @@ import os
 import sys
 import traceback
 from datetime import datetime
+import argparse
+from pathlib import Path
+import json
 
-def run_analysis(module_name, description):
+def setup_output_directory(data_file_path):
+    """Create output directory based on input file name"""
+    data_file = Path(data_file_path)
+    # Create folder name from input file (without extension), sanitize for filesystem
+    stem = data_file.stem
+    # Replace spaces and special characters with underscores
+    sanitized_stem = "".join(c if c.isalnum() else "_" for c in stem)
+    # Remove multiple consecutive underscores
+    sanitized_stem = "_".join(filter(None, sanitized_stem.split("_")))
+    folder_name = f"analysis_{sanitized_stem}"
+    
+    # Create the output directory
+    output_dir = Path(folder_name)
+    output_dir.mkdir(exist_ok=True)
+    
+    return output_dir
+
+def run_analysis(module_name, description, data_file, output_dir):
     """Run an analysis module and handle errors"""
     try:
         print(f"\n🔄 Running {description}...")
         
-        # Handle nested module imports
-        if '.' in module_name:
-            # For nested modules like core_analyses.consistency_analysis
-            parts = module_name.split('.')
-            module = __import__(module_name, fromlist=[parts[-1]])
-            func_name = f'generate_{parts[-1]}'
-        else:
-            # For top-level modules
-            module = __import__(module_name)
-            func_name = f'generate_{module_name}'
+        # Validate data file exists before starting
+        data_file_path = Path(data_file)
+        if not data_file_path.exists():
+            raise FileNotFoundError(f"Data file '{data_file}' not found")
         
-        if hasattr(module, func_name):
-            getattr(module, func_name)()
-        else:
-            print(f"⚠️  Warning: No {func_name} function found")
+        # Change to output directory
+        original_cwd = os.getcwd()
+        os.chdir(output_dir)
+        
+        try:
+            # Handle nested module imports
+            if '.' in module_name:
+                # For nested modules like core_analyses.consistency_analysis
+                parts = module_name.split('.')
+                module = __import__(module_name, fromlist=[parts[-1]])
+                func_name = f'generate_{parts[-1]}'
+            else:
+                # For top-level modules
+                module = __import__(module_name)
+                func_name = f'generate_{module_name}'
+            
+            if hasattr(module, func_name):
+                # Always pass the absolute path to the data file
+                func = getattr(module, func_name)
+                absolute_data_path = str(Path(original_cwd) / data_file)
+                func(data_file=absolute_data_path)
+            else:
+                raise AttributeError(f"No {func_name} function found in module {module_name}")
+            
+        finally:
+            # Always return to original directory
+            os.chdir(original_cwd)
         
         print(f"✅ {description} completed successfully!")
         return True
         
     except Exception as e:
         print(f"❌ Error in {description}: {str(e)}")
-        print(f"📝 Details: {traceback.format_exc()}")
+        if "data_file parameter is required" in str(e) or "not found" in str(e):
+            print(f"💡 Make sure the data file '{data_file}' exists and is accessible")
         return False
 
-def create_index_page():
+def create_index_page(output_dir, data_file):
     """Create main index page linking all analyses"""
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    data_file_name = Path(data_file).name
     
-    # Check which HTML files exist
+    # Check which HTML files exist in the output directory
     analyses = [
         ("landscape_overview.html", "📊 Landscape Overview", "KPI dashboard and content distribution"),
         ("personality_profile.html", "🧠 Personality Profile", "Big Five and partner traits analysis"),
+        ("personal_brand_analysis.html", "🎯 Personal Brand Analysis", "Comprehensive brand growth and customer acquisition analysis"),
         ("consistency_analysis.html", "📊 Consistency Analysis", "Trait stability and volatility assessment"),
         ("behavioral_flags_analysis.html", "🚩 Behavioral Flags", "Risk patterns and flag analysis"),
         ("content_trait_nexus.html", "🎯 Content-Trait Nexus", "Topic authority and skill complementarity"),
@@ -60,14 +100,14 @@ def create_index_page():
     
     available_analyses = []
     for filename, title, description in analyses:
-        if os.path.exists(filename):
+        if (output_dir / filename).exists():
             available_analyses.append((filename, title, description))
     
     html_template = f"""
     <!DOCTYPE html>
     <html>
     <head>
-        <title>Content-Personality Analysis Dashboard</title>
+        <title>Content-Personality Analysis Dashboard - {data_file_name}</title>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <style>
@@ -107,6 +147,15 @@ def create_index_page():
             .header p {{
                 font-size: 1.2em;
                 opacity: 0.9;
+            }}
+            
+            .data-source {{
+                background: rgba(255,255,255,0.1);
+                padding: 15px;
+                border-radius: 10px;
+                margin: 20px 0;
+                font-size: 1.1em;
+                border: 1px solid rgba(255,255,255,0.2);
             }}
             
             .dashboard-grid {{
@@ -247,6 +296,10 @@ def create_index_page():
                 <h1>🎯 Content-Personality Analysis</h1>
                 <p>Comprehensive analysis of LinkedIn content through the lens of psychology</p>
                 
+                <div class="data-source">
+                    <strong>📁 Data Source:</strong> {data_file_name}
+                </div>
+                
                 <div class="stats-bar">
                     <div class="stat-item">
                         <span class="stat-number">{len(available_analyses)}</span>
@@ -301,6 +354,7 @@ def create_index_page():
                 <p>📅 Generated on {current_time}</p>
                 <p>🔬 Powered by advanced psychometric analysis and machine learning</p>
                 <p>💡 Each analysis provides unique insights into content strategy and personality</p>
+                <p>📊 Analysis based on: {data_file_name}</p>
             </div>
         </div>
         
@@ -319,27 +373,108 @@ def create_index_page():
             // Welcome message
             console.log('🎯 Content-Personality Analysis Dashboard Loaded');
             console.log('📊 Available analyses: {len(available_analyses)}');
+            console.log('📁 Data source: {data_file_name}');
         </script>
     </body>
     </html>
     """
     
-    # Save index page
-    with open('index.html', 'w', encoding='utf-8') as f:
+    # Save index page in output directory
+    index_path = output_dir / 'index.html'
+    with open(index_path, 'w', encoding='utf-8') as f:
         f.write(html_template)
     
-    print(f"✅ Index page created with {len(available_analyses)} available analyses")
+    print(f"✅ Index page created at {index_path} with {len(available_analyses)} available analyses")
+
+def validate_data_file(data_file_path):
+    """Validate that the data file is in a supported format"""
+    data_file = Path(data_file_path)
+    
+    # Check if file exists
+    if not data_file.exists():
+        return False, f"Data file '{data_file_path}' not found"
+    
+    # Get file extension
+    file_ext = data_file.suffix.lower()
+    
+    # Supported formats
+    supported_formats = {'.csv', '.xlsx', '.xls', '.json', '.jsonl'}
+    
+    if file_ext not in supported_formats:
+        return False, f"Unsupported file format '{file_ext}'. Supported formats: {', '.join(supported_formats)}"
+    
+    # Additional validation for JSON files
+    if file_ext in {'.json', '.jsonl'}:
+        try:
+            with open(data_file_path, 'r', encoding='utf-8') as f:
+                if file_ext == '.json':
+                    # Validate JSON format
+                    json.load(f)
+                elif file_ext == '.jsonl':
+                    # Validate JSONL format (each line should be valid JSON)
+                    for line_num, line in enumerate(f, 1):
+                        line = line.strip()
+                        if line:  # Skip empty lines
+                            json.loads(line)
+        except json.JSONDecodeError as e:
+            return False, f"Invalid JSON format in file: {str(e)}"
+        except Exception as e:
+            return False, f"Error reading JSON file: {str(e)}"
+    
+    return True, "File format is valid"
+
+def get_file_format_info(data_file_path):
+    """Get information about the data file format"""
+    data_file = Path(data_file_path)
+    file_ext = data_file.suffix.lower()
+    
+    format_info = {
+        '.csv': ('CSV', '📊'),
+        '.xlsx': ('Excel', '📈'),
+        '.xls': ('Excel', '📈'),
+        '.json': ('JSON', '🔧'),
+        '.jsonl': ('JSONL', '🔧')
+    }
+    
+    return format_info.get(file_ext, ('Unknown', '📄'))
 
 def main():
     """Main execution function"""
+    parser = argparse.ArgumentParser(description='Generate Content-Personality Analysis')
+    parser.add_argument('data_file', help='Path to the data file to analyze (CSV, Excel, JSON, or JSONL)')
+    parser.add_argument('--output-dir', help='Custom output directory name (optional)')
+    
+    args = parser.parse_args()
+    
+    # Validate data file
+    is_valid, validation_message = validate_data_file(args.data_file)
+    if not is_valid:
+        print(f"❌ Error: {validation_message}")
+        sys.exit(1)
+    
+    data_file_path = Path(args.data_file)
+    file_format, format_emoji = get_file_format_info(args.data_file)
+    
+    # Setup output directory
+    if args.output_dir:
+        output_dir = Path(args.output_dir)
+    else:
+        output_dir = setup_output_directory(args.data_file)
+    
+    output_dir.mkdir(exist_ok=True)
+    
     print("🚀 Starting Content-Personality Analysis Suite")
+    print("=" * 60)
+    print(f"📁 Data File: {data_file_path.name}")
+    print(f"{format_emoji} File Format: {file_format}")
+    print(f"📂 Output Directory: {output_dir}")
     print("=" * 60)
     
     # List of analyses to run
     analyses_to_run = [
-        ("data_loader", "Data Loading & Preparation"),
         ("landscape_overview", "Landscape Overview Dashboard"),
         ("personality_profile", "Personality Profile Analysis"),
+        ("personal_brand_analysis", "Personal Brand Analysis Dashboard"),
         ("core_analyses.consistency_analysis", "Consistency Analysis"),
         ("core_analyses.behavioral_flags", "Behavioral Flags Analysis"),
         ("core_analyses.content_trait_nexus", "Content-Trait Nexus Analysis"),
@@ -347,10 +482,9 @@ def main():
         ("advanced_analytics.risk_assessment", "Risk Assessment & Predictive Analysis"),
         ("advanced_analytics.partnership_intelligence", "Partnership Intelligence Analysis"),
         ("advanced_analytics.evolution_tracking", "Evolution Tracking Analysis"),
-        # Add more as they're implemented
-        # ("topic_analysis", "Topic Relationship Analysis"),
-        # ("engagement_analysis", "Engagement Performance Analysis"),
-        # ("trend_analysis", "Trend Evolution Analysis"),
+        ("topic_analysis", "Topic Relationship Analysis"),
+        ("engagement_analysis", "Engagement Performance Analysis"),
+        ("trend_analysis", "Trend Evolution Analysis"),
     ]
     
     successful_runs = 0
@@ -358,7 +492,7 @@ def main():
     
     # Run each analysis
     for module_name, description in analyses_to_run:
-        if run_analysis(module_name, description):
+        if run_analysis(module_name, description, args.data_file, output_dir):
             successful_runs += 1
     
     print("\n" + "=" * 60)
@@ -366,11 +500,11 @@ def main():
     
     # Create index page
     print("\n🔄 Creating master dashboard...")
-    create_index_page()
+    create_index_page(output_dir, args.data_file)
     
     # Final summary
     print("\n🎉 Content-Personality Analysis Suite Complete!")
-    print(f"📂 Open 'index.html' to view the dashboard")
+    print(f"📂 Open '{output_dir / 'index.html'}' to view the dashboard")
     print(f"⏱️  Analysis completed at {datetime.now().strftime('%H:%M:%S')}")
     
     if successful_runs == total_runs:

@@ -317,10 +317,10 @@ def create_personality_insights(summary):
         'creativity_score': creativity_score
     }
 
-def generate_personality_profile():
+def generate_personality_profile(data_file: str = None):
     """Generate complete personality profile analysis"""
     print("🔄 Loading data...")
-    df = load_and_merge_data()
+    df = load_and_merge_data(data_file)
     summary = get_data_summary(df)
     
     print("🧠 Creating Big Five radar...")

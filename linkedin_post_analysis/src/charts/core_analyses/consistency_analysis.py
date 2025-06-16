@@ -284,10 +284,10 @@ def create_outlier_analysis(outlier_posts, df):
     
     return fig
 
-def generate_consistency_analysis():
+def generate_consistency_analysis(data_file: str = None):
     """Generate complete consistency analysis"""
     print("🔄 Loading data for consistency analysis...")
-    df = load_and_merge_data()
+    df = load_and_merge_data(data_file)
     
     print("📊 Calculating trait volatility...")
     volatility_scores = calculate_trait_volatility(df)

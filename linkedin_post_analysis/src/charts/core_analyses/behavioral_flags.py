@@ -435,10 +435,10 @@ def create_flag_drivers_chart(flag_drivers):
     
     return fig
 
-def generate_behavioral_flags():
+def generate_behavioral_flags(data_file: str = None):
     """Generate complete behavioral flags analysis"""
     print("🔄 Loading data for behavioral flags analysis...")
-    df = load_and_merge_data()
+    df = load_and_merge_data(data_file)
     
     print("🔗 Analyzing flag correlations...")
     correlation_matrix = analyze_flag_correlations(df)

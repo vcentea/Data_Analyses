@@ -7,6 +7,7 @@ Loads and merges personality data (JSONL) with engagement data (CSV)
 import json
 import pandas as pd
 import numpy as np
+from pathlib import Path
 from typing import Dict, List, Tuple
 import warnings
 warnings.filterwarnings('ignore')
@@ -57,20 +58,50 @@ def load_personality_data(jsonl_path: str = "results.jsonl") -> pd.DataFrame:
     
     return df
 
-def load_engagement_data(csv_path: str = "charlie posts_parsed BIG .csv") -> pd.DataFrame:
-    """Load engagement data from CSV file"""
-    try:
-        df = pd.read_csv(csv_path, sep=';', encoding='utf-8')
-    except UnicodeDecodeError:
+def load_engagement_data(data_path: str = "charlie posts_parsed BIG .csv") -> pd.DataFrame:
+    """Load engagement data from CSV or Excel file"""
+    file_path = Path(data_path)
+    file_ext = file_path.suffix.lower()
+    
+    if file_ext in ['.xlsx', '.xls']:
+        # Load Excel file
+        df = pd.read_excel(data_path)
+    else:
+        # Load CSV file with various encodings and separators
         try:
-            df = pd.read_csv(csv_path, sep=';', encoding='latin-1')
-        except UnicodeDecodeError:
-            df = pd.read_csv(csv_path, sep=';', encoding='cp1252')
+            df = pd.read_csv(data_path, sep=';', encoding='utf-8')
+        except (UnicodeDecodeError, pd.errors.ParserError):
+            try:
+                df = pd.read_csv(data_path, sep=';', encoding='latin-1')
+            except (UnicodeDecodeError, pd.errors.ParserError):
+                try:
+                    df = pd.read_csv(data_path, sep=';', encoding='cp1252')
+                except (UnicodeDecodeError, pd.errors.ParserError):
+                    try:
+                        df = pd.read_csv(data_path, sep=';', encoding='iso-8859-1')
+                    except (UnicodeDecodeError, pd.errors.ParserError):
+                        # Try with comma separator as fallback
+                        try:
+                            df = pd.read_csv(data_path, encoding='utf-8')
+                        except UnicodeDecodeError:
+                            df = pd.read_csv(data_path, encoding='latin-1')
     
-    # Create post_id to match with personality data (row 3 = post_id 3)
-    df['post_id'] = (df.index + 3).astype(str)  # Row 0 becomes post_id 3
+    # Handle different column naming patterns
+    if 'post_number' in df.columns:
+        # vlad_posts_processed.xlsx format
+        df = df.rename(columns={
+            'post_number': 'post_id',
+            'comment_count': 'comments',
+            'like_count': 'likes',
+            'combined_engagement': 'combined'
+        })
+        # Convert float post_id to int then to string (1.0 -> 1 -> '1')
+        df['post_id'] = df['post_id'].fillna(0).astype(int).astype(str)
+    else:
+        # Charlie format - create post_id from row index
+        df['post_id'] = (df.index + 3).astype(str)  # Row 0 becomes post_id 3
     
-    # Clean engagement data
+    # Clean engagement data  
     df['comments'] = pd.to_numeric(df['comments'], errors='coerce').fillna(0)
     df['likes'] = pd.to_numeric(df['likes'], errors='coerce').fillna(0) 
     df['combined'] = pd.to_numeric(df['combined'], errors='coerce').fillna(0)
@@ -107,22 +138,121 @@ def create_composite_scores(df: pd.DataFrame) -> pd.DataFrame:
     
     return df
 
-def load_and_merge_data() -> pd.DataFrame:
+def load_and_merge_data(data_file: str = None) -> pd.DataFrame:
     """Main function to load and merge all data"""
-    print("Loading personality data...")
-    personality_df = load_personality_data()
+    if not data_file:
+        raise ValueError("❌ Error: data_file parameter is required. No dummy data will be generated.")
     
-    print("Loading engagement data...")
-    engagement_df = load_engagement_data()
+    print(f"Loading data from {data_file}...")
+    
+    # Validate file exists
+    from pathlib import Path
+    if not Path(data_file).exists():
+        raise FileNotFoundError(f"❌ Error: Data file '{data_file}' not found.")
+    
+    # Load based on file type
+    data_path = Path(data_file).parent
+    file_stem = Path(data_file).stem
+    
+    if data_file.endswith('.jsonl'):
+        print("Loading personality data from JSONL...")
+        personality_df = load_personality_data(data_file)
+        
+        # Look for companion engagement data files
+        # First try common naming patterns (more specific first)
+        companion_files = []
+        
+        if "results" in file_stem:
+            base_name = file_stem.replace("_results", "").replace("results", "")
+            companion_files.extend([
+                data_path / f"{base_name}_posts_processed.xlsx",
+                data_path / f"{base_name}_posts_processed.csv",
+                data_path / f"{base_name}_posts.xlsx",
+                data_path / f"{base_name}_posts.csv",
+                data_path / f"{base_name}posts_parsed.csv",
+                data_path / f"{base_name}posts_parsed.xlsx"
+            ])
+        
+        # Then try same name with different extension
+        companion_files.extend([
+            data_path / f"{file_stem}.csv",
+            data_path / f"{file_stem}.xlsx", 
+            data_path / f"{file_stem}.xls"
+        ])
+        
+        # Find the first existing companion file
+        csv_file = None
+        for candidate in companion_files:
+            if candidate.exists():
+                csv_file = candidate
+                break
+        
+        # If no companion file found, look for any CSV/Excel in the directory
+        if csv_file is None:
+            csv_files = list(data_path.glob("*.csv")) + list(data_path.glob("*.xlsx")) + list(data_path.glob("*.xls"))
+            csv_files = [f for f in csv_files if f.name != Path(data_file).name]  # Exclude the input file
+            if csv_files:
+                csv_file = csv_files[0]
+        
+        if csv_file is None:
+            raise FileNotFoundError(f"❌ Error: No engagement data file (CSV/Excel) found in {data_path}")
+        
+        print(f"Loading engagement data from {csv_file}...")
+        engagement_df = load_engagement_data(str(csv_file))
+            
+    elif data_file.endswith(('.csv', '.xlsx', '.xls')):
+        print("Loading engagement data from CSV/Excel...")
+        engagement_df = load_engagement_data(data_file)
+        
+        # Look for companion personality data files  
+        # First try same name with .jsonl extension
+        companion_files = [
+            data_path / f"{file_stem}.jsonl"
+        ]
+        
+        # Also try common naming patterns
+        if "posts" in file_stem:
+            base_name = file_stem.replace("_posts", "").replace("posts", "").replace("_processed", "").replace("_parsed", "")
+            companion_files.extend([
+                data_path / f"{base_name}_results.jsonl",
+                data_path / f"{base_name}results.jsonl",
+                data_path / "results.jsonl"
+            ])
+        
+        # Find the first existing companion file
+        jsonl_file = None
+        for candidate in companion_files:
+            if candidate.exists():
+                jsonl_file = candidate
+                break
+        
+        # If no companion file found, look for any JSONL in the directory
+        if jsonl_file is None:
+            jsonl_files = list(data_path.glob("*.jsonl"))
+            if jsonl_files:
+                jsonl_file = jsonl_files[0]
+        
+        if jsonl_file is None:
+            raise FileNotFoundError(f"❌ Error: No personality data file (JSONL) found in {data_path}")
+        
+        print(f"Loading personality data from {jsonl_file}...")
+        personality_df = load_personality_data(str(jsonl_file))
+            
+    else:
+        raise ValueError(f"❌ Error: Unsupported file format. Expected .jsonl, .csv, .xlsx, or .xls")
     
     print("Merging datasets...")
     merged_df = pd.merge(personality_df, engagement_df, on='post_id', how='inner')
     
+    if len(merged_df) == 0:
+        raise ValueError("❌ Error: No matching post_id found between personality and engagement data.")
+    
     print("Creating composite scores...")
     merged_df = create_composite_scores(merged_df)
     
-    print(f"✅ Loaded {len(merged_df)} posts with complete data")
-    print(f"📊 Columns: {list(merged_df.columns)}")
+    print(f"✅ Loaded {len(merged_df)} posts with real data")
+    print(f"📊 Data source: {data_file}")
+    print(f"📊 Columns: {len(merged_df.columns)} total")
     
     return merged_df
 

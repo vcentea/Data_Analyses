@@ -17,10 +17,10 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from data_loader import load_and_merge_data
 
-def generate_partnership_intelligence():
+def generate_partnership_intelligence(data_file: str = None):
     """Generate complete partnership intelligence analysis"""
     print("Loading data for partnership intelligence...")
-    df = load_and_merge_data()
+    df = load_and_merge_data(data_file)
     
     # Partnership trait analysis
     partner_traits = [col for col in df.columns if col.startswith('partner_')]

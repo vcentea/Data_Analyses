@@ -414,10 +414,10 @@ def create_authenticity_validation_chart(authenticity_validation):
     
     return fig
 
-def generate_risk_assessment():
+def generate_risk_assessment(data_file: str = None):
     """Generate complete risk assessment and predictive analysis"""
     print("Loading data for risk assessment...")
-    df = load_and_merge_data()
+    df = load_and_merge_data(data_file)
     
     print("Building self-promotion prediction model...")
     self_promotion_model = build_self_promotion_predictor(df)
@@ -450,10 +450,10 @@ def generate_risk_assessment():
     low_risk_pct = (low_risk_posts / total_posts) * 100
     
     most_escalating_flag = max(escalation_patterns.keys(), 
-                              key=lambda x: escalation_patterns[x]['escalation_score'])
+                              key=lambda x: escalation_patterns[x]['escalation_score']) if escalation_patterns else 'None'
     
     highest_auth_risk = max(authenticity_validation.keys(),
-                           key=lambda x: authenticity_validation[x]['authenticity_risk'])
+                           key=lambda x: authenticity_validation[x]['authenticity_risk']) if authenticity_validation else 'None'
     
     # Create HTML template
     html_template = f"""<!DOCTYPE html>
@@ -659,10 +659,8 @@ def generate_risk_assessment():
     
     <div class="warning">
         <strong>⚠️ Escalation Alert:</strong> 
-        "{most_escalating_flag.replace('_', ' ').title()}" flag shows highest escalation pattern 
-        ({escalation_patterns[most_escalating_flag]['escalation_score']:.2f} escalation score).
-        Authenticity risk highest for "{highest_auth_risk.replace('_', ' ').title()}" trait 
-        ({authenticity_validation[highest_auth_risk]['authenticity_risk']:.1f}% risk).
+        {f'"{most_escalating_flag.replace("_", " ").title()}" flag shows highest escalation pattern ({escalation_patterns[most_escalating_flag]["escalation_score"]:.2f} escalation score).' if most_escalating_flag != 'None' and escalation_patterns else 'No significant flag escalation patterns detected.'}
+        {f'Authenticity risk highest for "{highest_auth_risk.replace("_", " ").title()}" trait ({authenticity_validation[highest_auth_risk]["authenticity_risk"]:.1f}% risk).' if highest_auth_risk != 'None' and authenticity_validation else 'No significant authenticity risks identified.'}
     </div>
     
     <div class="chart-container">

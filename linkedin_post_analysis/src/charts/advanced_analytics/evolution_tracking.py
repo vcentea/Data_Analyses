@@ -37,10 +37,10 @@ def get_trend_interpretation(analysis):
     else:
         return f"📊 {name} shows minor fluctuations over time ({change_pct:+.1f}%), within normal variation range."
 
-def generate_evolution_tracking():
+def generate_evolution_tracking(data_file: str = None):
     """Generate complete evolution tracking analysis"""
     print("Loading data for evolution tracking...")
-    df = load_and_merge_data()
+    df = load_and_merge_data(data_file)
     
     # Sort by post_id for chronological analysis (REVERSE because data is newest to oldest)
     # Convert post_id to numeric for proper sorting, then reverse for chronological order

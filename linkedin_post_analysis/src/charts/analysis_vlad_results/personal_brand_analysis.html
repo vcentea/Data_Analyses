@@ -1,0 +1,2677 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Brand Analysis Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <style>
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            padding: 40px 20px;
+        }
+        
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .brand-score {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .score-number {
+            font-size: 4em;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .kpi-card {
+            background: rgba(255,255,255,0.95);
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.3);
+            transition: transform 0.3s ease;
+        }
+        
+        .kpi-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .kpi-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .kpi-label {
+            font-size: 0.9em;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .trend-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+        
+        .trend-card {
+            background: rgba(255,255,255,0.95);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            backdrop-filter: blur(10px);
+        }
+        
+        .trend-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        
+        .trend-positive { color: #28a745; }
+        .trend-negative { color: #dc3545; }
+        .trend-neutral { color: #6c757d; }
+        
+        .trend-arrow {
+            font-size: 1.2em;
+            margin-left: 5px;
+        }
+        
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .chart-container {
+            background: rgba(255,255,255,0.95);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        
+        .chart-title {
+            font-size: 1.4em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #2E86AB;
+            text-align: center;
+        }
+        
+        .chart-canvas {
+            position: relative;
+            height: 400px;
+            width: 100%;
+        }
+        
+        .insights-section {
+            background: rgba(255,255,255,0.95);
+            padding: 40px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+        }
+        
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        
+        .insight-card {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            border-left: 5px solid #2E86AB;
+        }
+        
+        .insight-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #2E86AB;
+        }
+        
+        .insight-list {
+            list-style: none;
+        }
+        
+        .insight-list li {
+            margin-bottom: 10px;
+            padding-left: 20px;
+            position: relative;
+        }
+        
+        .insight-list li:before {
+            content: "•";
+            color: #2E86AB;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+        
+        .recommendations-section {
+            background: rgba(255,255,255,0.95);
+            padding: 40px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+        }
+        
+        .footer {
+            text-align: center;
+            color: white;
+            padding: 20px;
+            opacity: 0.8;
+        }
+        
+        @media (max-width: 768px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .kpi-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .trend-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        
+        <div class="header">
+            <h1>🎯 Personal Brand Analysis Dashboard</h1>
+            <p>Comprehensive analysis of content performance and brand growth potential</p>
+            
+            <div class="brand-score">
+                <div class="score-number">71.2/100</div>
+                <div style="font-size: 1.2em; margin-top: 10px;">Brand Growth Potential Score</div>
+                <div style="font-size: 1em; opacity: 0.8; margin-top: 5px;">Based on 305 posts analyzed</div>
+            </div>
+        </div>
+        
+        
+        <div class="kpi-grid">
+            
+            <div class="kpi-card">
+                <div class="kpi-value trend-neutral">🎭 64.0%</div>
+                <div class="kpi-label">Brand Authenticity</div>
+            </div>
+            
+            <div class="kpi-card">
+                <div class="kpi-value trend-neutral">📈 72.9%</div>
+                <div class="kpi-label">Growth Execution</div>
+            </div>
+            
+            <div class="kpi-card">
+                <div class="kpi-value trend-neutral">🎓 68.8%</div>
+                <div class="kpi-label">Content Authority</div>
+            </div>
+            
+            <div class="kpi-card">
+                <div class="kpi-value trend-neutral">🎯 67.1%</div>
+                <div class="kpi-label">Acquisition Readiness</div>
+            </div>
+            
+            <div class="kpi-card">
+                <div class="kpi-value trend-neutral">💬 62.6%</div>
+                <div class="kpi-label">Engagement Quality</div>
+            </div>
+            
+            <div class="kpi-card">
+                <div class="kpi-value trend-negative">⚠️ 18.8%</div>
+                <div class="kpi-label">Brand Risk</div>
+            </div>
+            
+        </div>
+        
+        
+        <div class="trend-grid">
+            
+            <div class="trend-card">
+                <div class="trend-value trend-neutral">
+                    🧠 0%
+                    <span class="trend-arrow">→</span>
+                </div>
+                <div class="kpi-label">Thought Leadership</div>
+            </div>
+            
+            <div class="trend-card">
+                <div class="trend-value trend-neutral">
+                    🎭 0%
+                    <span class="trend-arrow">→</span>
+                </div>
+                <div class="kpi-label">Authenticity Gaps</div>
+            </div>
+            
+            <div class="trend-card">
+                <div class="trend-value trend-neutral">
+                    🎯 0%
+                    <span class="trend-arrow">→</span>
+                </div>
+                <div class="kpi-label">Conversion Intent</div>
+            </div>
+            
+            <div class="trend-card">
+                <div class="trend-value trend-neutral">
+                    📢 0%
+                    <span class="trend-arrow">→</span>
+                </div>
+                <div class="kpi-label">Over-Promotion</div>
+            </div>
+            
+            <div class="trend-card">
+                <div class="trend-value trend-neutral">
+                    💬 0%
+                    <span class="trend-arrow">→</span>
+                </div>
+                <div class="kpi-label">Audience Engagement</div>
+            </div>
+            
+            <div class="trend-card">
+                <div class="trend-value trend-neutral">
+                    🚀 0%
+                    <span class="trend-arrow">→</span>
+                </div>
+                <div class="kpi-label">Viral Potential</div>
+            </div>
+            
+        </div>
+        
+        
+        <div class="charts-grid">
+            
+            <div class="chart-container">
+                <div class="chart-title">Growth Metrics Trend Analysis</div>
+                <div class="chart-canvas">
+                    <canvas id="growthTrendChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <div class="chart-title">Brand & Growth Correlation Matrix</div>
+                <div class="chart-canvas">
+                    <canvas id="correlationChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <div class="chart-title">Customer Acquisition Traits</div>
+                <div class="chart-canvas">
+                    <canvas id="acquisitionRadarChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <div class="chart-title">Brand Growth Evolution Timeline</div>
+                <div class="chart-canvas">
+                    <canvas id="evolutionTimelineChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <div class="chart-title">Personal Brand Personality Profile</div>
+                <div class="chart-canvas">
+                    <canvas id="personalityProfileChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <div class="chart-title">Growth vs Brand Risk Analysis</div>
+                <div class="chart-canvas">
+                    <canvas id="riskGrowthScatterChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <div class="chart-title">Content Strategy Distribution</div>
+                <div class="chart-canvas">
+                    <canvas id="contentDistributionChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <div class="chart-title">Brand Evolution Over Time</div>
+                <div class="chart-canvas">
+                    <canvas id="brandEvolutionChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <div class="chart-title">Brand Risk Indicators</div>
+                <div class="chart-canvas">
+                    <canvas id="riskIndicatorsChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <div class="chart-title">Audience Engagement Evolution</div>
+                <div class="chart-canvas">
+                    <canvas id="engagementEvolutionChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <div class="chart-title">Growth KPIs vs Industry Benchmarks</div>
+                <div class="chart-canvas">
+                    <canvas id="benchmarkRadarChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <div class="chart-title">Customer Acquisition Readiness</div>
+                <div class="chart-canvas">
+                    <canvas id="acquisitionReadinessChart"></canvas>
+                </div>
+            </div>
+            
+        </div>
+        
+        
+        <div class="insights-section">
+            <h2 style="text-align: center; margin-bottom: 30px; color: #2E86AB;">📊 Key Insights</h2>
+            <div class="insights-grid">
+                
+            <div class="insight-card">
+                <div class="insight-title">🔗 Strong Brand Correlations</div>
+                <ul class="insight-list">
+                    <li>Expertise Demonstration is positively correlated with Conversion Intent (r=0.89)</li><li>Authenticity is positively correlated with Consistency (r=0.87)</li><li>Consistency is positively correlated with Value Delivery (r=0.79)</li>
+                </ul>
+            </div>
+            
+            <div class="insight-card">
+                <div class="insight-title">💪 Customer Acquisition Strengths</div>
+                <ul class="insight-list">
+                    <li>Good customer acquisition foundation with room for optimization</li>
+                </ul>
+            </div>
+            
+            <div class="insight-card">
+                <div class="insight-title">🚀 Growth Acceleration Opportunities</div>
+                <ul class="insight-list">
+                    <li>No specific growth acceleration opportunities identified in current data</li>
+                </ul>
+            </div>
+            
+            <div class="insight-card">
+                <div class="insight-title">🛡️ Brand Risk Mitigation</div>
+                <ul class="insight-list">
+                    <li>Address high-risk behaviors: over_promotion, authenticity_gaps, audience_disconnect</li>
+                </ul>
+            </div>
+            
+            </div>
+        </div>
+        
+        
+        <div class="recommendations-section">
+            <h2 style="text-align: center; margin-bottom: 30px; color: #2E86AB;">💡 Strategic Recommendations</h2>
+            <div class="insights-grid">
+                
+            <div class="insight-card">
+                <div class="insight-title">📝 Content Strategy Optimization</div>
+                <ul class="insight-list">
+                    <li>Increase educational content to build authority and trust</li>
+                </ul>
+            </div>
+            
+            <div class="insight-card">
+                <div class="insight-title">💎 Personal Brand Strengthening</div>
+                <ul class="insight-list">
+                    <li>Focus on authentic storytelling and consistent messaging</li>
+                </ul>
+            </div>
+            
+            <div class="insight-card">
+                <div class="insight-title">🎯 Customer Acquisition Improvement</div>
+                <ul class="insight-list">
+                    <li>Strengthen call-to-action effectiveness and social proof elements</li>
+                </ul>
+            </div>
+            
+            <div class="insight-card">
+                <div class="insight-title">🛡️ Risk Mitigation Approaches</div>
+                <ul class="insight-list">
+                    <li>Implement 80/20 rule: 80% value-driven content, 20% promotional</li>
+                </ul>
+            </div>
+            
+            </div>
+        </div>
+        
+        
+        <div class="footer">
+            <p>📅 Generated on 2025-06-16 12:53:44</p>
+            <p>🎯 Personal Brand Analysis Dashboard - Powered by advanced analytics</p>
+        </div>
+        
+    </div>
+    
+    <script>
+        
+        // Chart data
+        const chartData = {
+  "growth_metrics_trend": {
+    "labels": [
+      "Follower Growth Catalyst",
+      "Viral Potential",
+      "Conversion Intent",
+      "Brand Recall",
+      "Audience Engagement"
+    ],
+    "historical": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "recent": [
+      53.8,
+      86.9,
+      67.5,
+      66.9,
+      58.4
+    ],
+    "changes": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "correlation_matrix": {
+    "labels": [
+      "authenticity",
+      "consistency",
+      "expertise_demonstration",
+      "trust_building",
+      "value_delivery",
+      "audience_engagement",
+      "follower_growth_catalyst",
+      "conversion_intent"
+    ],
+    "data": [
+      [
+        1.0,
+        0.871114556061949,
+        0.4225521877989776,
+        0.44831389464508864,
+        0.6444331382834674,
+        0.1374272069244928,
+        0.24541120167021319,
+        0.49215994249111483
+      ],
+      [
+        0.871114556061949,
+        1.0,
+        0.5725220137837245,
+        0.4715968034473717,
+        0.7922567381505443,
+        0.2016533532293174,
+        0.39071539461709304,
+        0.6172074204063495
+      ],
+      [
+        0.4225521877989776,
+        0.5725220137837245,
+        1.0,
+        0.5839007739220281,
+        0.5930009338081225,
+        0.2092021697643275,
+        0.413597562650117,
+        0.8897582684680838
+      ],
+      [
+        0.44831389464508864,
+        0.4715968034473717,
+        0.5839007739220281,
+        1.0,
+        0.5324107935703088,
+        0.3320706238678504,
+        0.33656086949372016,
+        0.5615663847291108
+      ],
+      [
+        0.6444331382834674,
+        0.7922567381505443,
+        0.5930009338081225,
+        0.5324107935703088,
+        1.0,
+        0.23564958370702596,
+        0.4013768335813273,
+        0.6079852649411445
+      ],
+      [
+        0.1374272069244928,
+        0.2016533532293174,
+        0.2092021697643275,
+        0.3320706238678504,
+        0.23564958370702596,
+        1.0,
+        0.6961201773116381,
+        0.16701229095786246
+      ],
+      [
+        0.24541120167021319,
+        0.39071539461709304,
+        0.413597562650117,
+        0.33656086949372016,
+        0.4013768335813273,
+        0.6961201773116381,
+        1.0,
+        0.4347963337339881
+      ],
+      [
+        0.49215994249111483,
+        0.6172074204063495,
+        0.8897582684680838,
+        0.5615663847291108,
+        0.6079852649411445,
+        0.16701229095786246,
+        0.4347963337339881,
+        1.0
+      ]
+    ]
+  },
+  "acquisition_radar": {
+    "labels": [
+      "Trust Building",
+      "Value Delivery",
+      "Social Proof",
+      "Call To Action Effectiveness",
+      "Audience Engagement",
+      "Expertise Demonstration",
+      "Thought Leadership"
+    ],
+    "data": [
+      77.0,
+      73.4,
+      75.2,
+      49.2,
+      54.3,
+      80.5,
+      52.5
+    ],
+    "benchmarks": [
+      75,
+      75,
+      75,
+      75,
+      75,
+      75,
+      75
+    ]
+  },
+  "evolution_timeline": {
+    "labels": [
+      "Q1",
+      "Q2",
+      "Q3",
+      "Q4",
+      "Recent"
+    ],
+    "datasets": [
+      {
+        "label": "Authenticity",
+        "data": [
+          0,
+          0,
+          0,
+          0,
+          80.5
+        ]
+      },
+      {
+        "label": "Consistency",
+        "data": [
+          0,
+          0,
+          0,
+          0,
+          66.9
+        ]
+      },
+      {
+        "label": "Thought Leadership",
+        "data": [
+          0,
+          0,
+          0,
+          0,
+          57.4
+        ]
+      }
+    ]
+  },
+  "personality_profile": {
+    "labels": [
+      "Authenticity",
+      "Expertise Demonstration",
+      "Relatability",
+      "Consistency",
+      "Thought Leadership"
+    ],
+    "data": [
+      83.6,
+      80.5,
+      34.3,
+      74.0,
+      52.5
+    ]
+  },
+  "risk_vs_growth": {
+    "data": [
+      {
+        "x": 166.66666666666669,
+        "y": 400.0
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 350.0
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 316.66666666666663
+      },
+      {
+        "x": 166.66666666666669,
+        "y": 400.0
+      },
+      {
+        "x": 66.66666666666666,
+        "y": 433.3333333333333
+      },
+      {
+        "x": 100.0,
+        "y": 450.0
+      },
+      {
+        "x": 100.0,
+        "y": 433.3333333333333
+      },
+      {
+        "x": 100.0,
+        "y": 350.0
+      },
+      {
+        "x": 100.0,
+        "y": 450.0
+      },
+      {
+        "x": 100.0,
+        "y": 366.66666666666663
+      },
+      {
+        "x": 66.66666666666666,
+        "y": 333.33333333333337
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 433.3333333333333
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 316.66666666666663
+      },
+      {
+        "x": 66.66666666666666,
+        "y": 400.0
+      },
+      {
+        "x": 100.0,
+        "y": 433.3333333333333
+      },
+      {
+        "x": 33.33333333333333,
+        "y": 450.0
+      },
+      {
+        "x": 100.0,
+        "y": 450.0
+      },
+      {
+        "x": 166.66666666666669,
+        "y": 333.33333333333337
+      },
+      {
+        "x": 166.66666666666669,
+        "y": 450.0
+      },
+      {
+        "x": 66.66666666666666,
+        "y": 333.33333333333337
+      },
+      {
+        "x": 166.66666666666669,
+        "y": 400.0
+      },
+      {
+        "x": 33.33333333333333,
+        "y": 450.0
+      },
+      {
+        "x": 200.0,
+        "y": 233.33333333333334
+      },
+      {
+        "x": 166.66666666666669,
+        "y": 416.6666666666667
+      },
+      {
+        "x": 100.0,
+        "y": 450.0
+      },
+      {
+        "x": 100.0,
+        "y": 450.0
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 433.3333333333333
+      },
+      {
+        "x": 100.0,
+        "y": 416.6666666666667
+      },
+      {
+        "x": 66.66666666666666,
+        "y": 250.0
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 416.6666666666667
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 416.6666666666667
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 333.33333333333337
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 333.33333333333337
+      },
+      {
+        "x": 100.0,
+        "y": 383.33333333333337
+      },
+      {
+        "x": 100.0,
+        "y": 300.0
+      },
+      {
+        "x": 166.66666666666669,
+        "y": 283.33333333333337
+      },
+      {
+        "x": 166.66666666666669,
+        "y": 400.0
+      },
+      {
+        "x": 200.0,
+        "y": 433.3333333333333
+      },
+      {
+        "x": 100.0,
+        "y": 450.0
+      },
+      {
+        "x": 66.66666666666666,
+        "y": 466.6666666666667
+      },
+      {
+        "x": 266.66666666666663,
+        "y": 216.66666666666666
+      },
+      {
+        "x": 100.0,
+        "y": 383.33333333333337
+      },
+      {
+        "x": 100.0,
+        "y": 433.3333333333333
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 433.3333333333333
+      },
+      {
+        "x": 166.66666666666669,
+        "y": 283.33333333333337
+      },
+      {
+        "x": 200.0,
+        "y": 400.0
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 383.33333333333337
+      },
+      {
+        "x": 166.66666666666669,
+        "y": 300.0
+      },
+      {
+        "x": 166.66666666666669,
+        "y": 450.0
+      },
+      {
+        "x": 100.0,
+        "y": 333.33333333333337
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 350.0
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 366.66666666666663
+      },
+      {
+        "x": 100.0,
+        "y": 416.6666666666667
+      },
+      {
+        "x": 100.0,
+        "y": 383.33333333333337
+      },
+      {
+        "x": 100.0,
+        "y": 416.6666666666667
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 400.0
+      },
+      {
+        "x": 100.0,
+        "y": 450.0
+      },
+      {
+        "x": 100.0,
+        "y": 416.6666666666667
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 400.0
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 350.0
+      },
+      {
+        "x": 100.0,
+        "y": 366.66666666666663
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 450.0
+      },
+      {
+        "x": 166.66666666666669,
+        "y": 316.66666666666663
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 350.0
+      },
+      {
+        "x": 100.0,
+        "y": 416.6666666666667
+      },
+      {
+        "x": 100.0,
+        "y": 416.6666666666667
+      },
+      {
+        "x": 100.0,
+        "y": 450.0
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 316.66666666666663
+      },
+      {
+        "x": 166.66666666666669,
+        "y": 266.66666666666663
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 316.66666666666663
+      },
+      {
+        "x": 166.66666666666669,
+        "y": 316.66666666666663
+      },
+      {
+        "x": 66.66666666666666,
+        "y": 350.0
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 416.6666666666667
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 416.6666666666667
+      },
+      {
+        "x": 100.0,
+        "y": 383.33333333333337
+      },
+      {
+        "x": 166.66666666666669,
+        "y": 316.66666666666663
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 433.3333333333333
+      },
+      {
+        "x": 66.66666666666666,
+        "y": 433.3333333333333
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 416.6666666666667
+      },
+      {
+        "x": 100.0,
+        "y": 350.0
+      },
+      {
+        "x": 100.0,
+        "y": 350.0
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 433.3333333333333
+      },
+      {
+        "x": 100.0,
+        "y": 333.33333333333337
+      },
+      {
+        "x": 166.66666666666669,
+        "y": 350.0
+      },
+      {
+        "x": 100.0,
+        "y": 416.6666666666667
+      },
+      {
+        "x": 200.0,
+        "y": 350.0
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 383.33333333333337
+      },
+      {
+        "x": 66.66666666666666,
+        "y": 383.33333333333337
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 400.0
+      },
+      {
+        "x": 100.0,
+        "y": 400.0
+      },
+      {
+        "x": 166.66666666666669,
+        "y": 333.33333333333337
+      },
+      {
+        "x": 166.66666666666669,
+        "y": 416.6666666666667
+      },
+      {
+        "x": 200.0,
+        "y": 300.0
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 283.33333333333337
+      },
+      {
+        "x": 100.0,
+        "y": 333.33333333333337
+      },
+      {
+        "x": 66.66666666666666,
+        "y": 400.0
+      },
+      {
+        "x": 66.66666666666666,
+        "y": 316.66666666666663
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 416.6666666666667
+      },
+      {
+        "x": 66.66666666666666,
+        "y": 400.0
+      },
+      {
+        "x": 166.66666666666669,
+        "y": 383.33333333333337
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 333.33333333333337
+      },
+      {
+        "x": 166.66666666666669,
+        "y": 283.33333333333337
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 416.6666666666667
+      },
+      {
+        "x": 100.0,
+        "y": 366.66666666666663
+      },
+      {
+        "x": 166.66666666666669,
+        "y": 366.66666666666663
+      },
+      {
+        "x": 166.66666666666669,
+        "y": 300.0
+      },
+      {
+        "x": 233.33333333333334,
+        "y": 283.33333333333337
+      },
+      {
+        "x": 200.0,
+        "y": 200.0
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 383.33333333333337
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 366.66666666666663
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 383.33333333333337
+      },
+      {
+        "x": 100.0,
+        "y": 350.0
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 316.66666666666663
+      },
+      {
+        "x": 100.0,
+        "y": 400.0
+      },
+      {
+        "x": 66.66666666666666,
+        "y": 383.33333333333337
+      },
+      {
+        "x": 100.0,
+        "y": 366.66666666666663
+      },
+      {
+        "x": 100.0,
+        "y": 383.33333333333337
+      },
+      {
+        "x": 100.0,
+        "y": 400.0
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 383.33333333333337
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 333.33333333333337
+      },
+      {
+        "x": 66.66666666666666,
+        "y": 450.0
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 350.0
+      },
+      {
+        "x": 66.66666666666666,
+        "y": 350.0
+      },
+      {
+        "x": 100.0,
+        "y": 383.33333333333337
+      },
+      {
+        "x": 100.0,
+        "y": 400.0
+      },
+      {
+        "x": 100.0,
+        "y": 350.0
+      },
+      {
+        "x": 100.0,
+        "y": 300.0
+      },
+      {
+        "x": 66.66666666666666,
+        "y": 383.33333333333337
+      },
+      {
+        "x": 33.33333333333333,
+        "y": 350.0
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 416.6666666666667
+      },
+      {
+        "x": 100.0,
+        "y": 350.0
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 366.66666666666663
+      },
+      {
+        "x": 100.0,
+        "y": 316.66666666666663
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 283.33333333333337
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 266.66666666666663
+      },
+      {
+        "x": 66.66666666666666,
+        "y": 366.66666666666663
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 350.0
+      },
+      {
+        "x": 100.0,
+        "y": 416.6666666666667
+      },
+      {
+        "x": 166.66666666666669,
+        "y": 400.0
+      },
+      {
+        "x": 200.0,
+        "y": 216.66666666666666
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 333.33333333333337
+      },
+      {
+        "x": 66.66666666666666,
+        "y": 416.6666666666667
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 350.0
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 350.0
+      },
+      {
+        "x": 100.0,
+        "y": 400.0
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 200.0
+      },
+      {
+        "x": 66.66666666666666,
+        "y": 366.66666666666663
+      },
+      {
+        "x": 233.33333333333334,
+        "y": 350.0
+      },
+      {
+        "x": 100.0,
+        "y": 300.0
+      },
+      {
+        "x": 100.0,
+        "y": 416.6666666666667
+      },
+      {
+        "x": 100.0,
+        "y": 416.6666666666667
+      },
+      {
+        "x": 166.66666666666669,
+        "y": 316.66666666666663
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 416.6666666666667
+      },
+      {
+        "x": 100.0,
+        "y": 266.66666666666663
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 283.33333333333337
+      },
+      {
+        "x": 166.66666666666669,
+        "y": 266.66666666666663
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 350.0
+      },
+      {
+        "x": 166.66666666666669,
+        "y": 283.33333333333337
+      },
+      {
+        "x": 100.0,
+        "y": 383.33333333333337
+      },
+      {
+        "x": 100.0,
+        "y": 333.33333333333337
+      },
+      {
+        "x": 200.0,
+        "y": 300.0
+      },
+      {
+        "x": 200.0,
+        "y": 366.66666666666663
+      },
+      {
+        "x": 166.66666666666669,
+        "y": 350.0
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 333.33333333333337
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 416.6666666666667
+      },
+      {
+        "x": 100.0,
+        "y": 316.66666666666663
+      },
+      {
+        "x": 166.66666666666669,
+        "y": 350.0
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 416.6666666666667
+      },
+      {
+        "x": 166.66666666666669,
+        "y": 300.0
+      },
+      {
+        "x": 66.66666666666666,
+        "y": 383.33333333333337
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 416.6666666666667
+      },
+      {
+        "x": 66.66666666666666,
+        "y": 300.0
+      },
+      {
+        "x": 33.33333333333333,
+        "y": 433.3333333333333
+      },
+      {
+        "x": 33.33333333333333,
+        "y": 450.0
+      },
+      {
+        "x": 0.0,
+        "y": 383.33333333333337
+      },
+      {
+        "x": 100.0,
+        "y": 366.66666666666663
+      },
+      {
+        "x": 100.0,
+        "y": 316.66666666666663
+      },
+      {
+        "x": 66.66666666666666,
+        "y": 366.66666666666663
+      },
+      {
+        "x": 166.66666666666669,
+        "y": 250.0
+      },
+      {
+        "x": 100.0,
+        "y": 250.0
+      },
+      {
+        "x": 100.0,
+        "y": 350.0
+      },
+      {
+        "x": 33.33333333333333,
+        "y": 433.3333333333333
+      },
+      {
+        "x": 166.66666666666669,
+        "y": 316.66666666666663
+      },
+      {
+        "x": 200.0,
+        "y": 366.66666666666663
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 366.66666666666663
+      },
+      {
+        "x": 100.0,
+        "y": 400.0
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 366.66666666666663
+      },
+      {
+        "x": 100.0,
+        "y": 383.33333333333337
+      },
+      {
+        "x": 66.66666666666666,
+        "y": 333.33333333333337
+      },
+      {
+        "x": 166.66666666666669,
+        "y": 450.0
+      },
+      {
+        "x": 100.0,
+        "y": 383.33333333333337
+      },
+      {
+        "x": 100.0,
+        "y": 300.0
+      },
+      {
+        "x": 200.0,
+        "y": 383.33333333333337
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 433.3333333333333
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 366.66666666666663
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 316.66666666666663
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 350.0
+      },
+      {
+        "x": 166.66666666666669,
+        "y": 316.66666666666663
+      },
+      {
+        "x": 100.0,
+        "y": 350.0
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 283.33333333333337
+      },
+      {
+        "x": 100.0,
+        "y": 366.66666666666663
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 383.33333333333337
+      },
+      {
+        "x": 266.66666666666663,
+        "y": 166.66666666666669
+      },
+      {
+        "x": 200.0,
+        "y": 366.66666666666663
+      },
+      {
+        "x": 100.0,
+        "y": 466.6666666666667
+      },
+      {
+        "x": 100.0,
+        "y": 433.3333333333333
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 366.66666666666663
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 366.66666666666663
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 383.33333333333337
+      },
+      {
+        "x": 100.0,
+        "y": 400.0
+      },
+      {
+        "x": 200.0,
+        "y": 216.66666666666666
+      },
+      {
+        "x": 100.0,
+        "y": 383.33333333333337
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 366.66666666666663
+      },
+      {
+        "x": 33.33333333333333,
+        "y": 450.0
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 366.66666666666663
+      },
+      {
+        "x": 166.66666666666669,
+        "y": 350.0
+      },
+      {
+        "x": 200.0,
+        "y": 366.66666666666663
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 400.0
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 400.0
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 350.0
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 400.0
+      },
+      {
+        "x": 0.0,
+        "y": 433.3333333333333
+      },
+      {
+        "x": 166.66666666666669,
+        "y": 383.33333333333337
+      },
+      {
+        "x": 100.0,
+        "y": 350.0
+      },
+      {
+        "x": 66.66666666666666,
+        "y": 416.6666666666667
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 366.66666666666663
+      },
+      {
+        "x": 33.33333333333333,
+        "y": 450.0
+      },
+      {
+        "x": 166.66666666666669,
+        "y": 416.6666666666667
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 350.0
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 383.33333333333337
+      },
+      {
+        "x": 166.66666666666669,
+        "y": 283.33333333333337
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 433.3333333333333
+      },
+      {
+        "x": 100.0,
+        "y": 416.6666666666667
+      },
+      {
+        "x": 66.66666666666666,
+        "y": 350.0
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 333.33333333333337
+      },
+      {
+        "x": 66.66666666666666,
+        "y": 433.3333333333333
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 366.66666666666663
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 316.66666666666663
+      },
+      {
+        "x": 66.66666666666666,
+        "y": 466.6666666666667
+      },
+      {
+        "x": 66.66666666666666,
+        "y": 450.0
+      },
+      {
+        "x": 166.66666666666669,
+        "y": 400.0
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 366.66666666666663
+      },
+      {
+        "x": 166.66666666666669,
+        "y": 450.0
+      },
+      {
+        "x": 100.0,
+        "y": 450.0
+      },
+      {
+        "x": 166.66666666666669,
+        "y": 366.66666666666663
+      },
+      {
+        "x": 166.66666666666669,
+        "y": 400.0
+      },
+      {
+        "x": 66.66666666666666,
+        "y": 400.0
+      },
+      {
+        "x": 166.66666666666669,
+        "y": 300.0
+      },
+      {
+        "x": 66.66666666666666,
+        "y": 400.0
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 433.3333333333333
+      },
+      {
+        "x": 100.0,
+        "y": 450.0
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 450.0
+      },
+      {
+        "x": 100.0,
+        "y": 316.66666666666663
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 350.0
+      },
+      {
+        "x": 66.66666666666666,
+        "y": 400.0
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 366.66666666666663
+      },
+      {
+        "x": 233.33333333333334,
+        "y": 383.33333333333337
+      },
+      {
+        "x": 100.0,
+        "y": 450.0
+      },
+      {
+        "x": 100.0,
+        "y": 266.66666666666663
+      },
+      {
+        "x": 66.66666666666666,
+        "y": 316.66666666666663
+      },
+      {
+        "x": 166.66666666666669,
+        "y": 383.33333333333337
+      },
+      {
+        "x": 166.66666666666669,
+        "y": 333.33333333333337
+      },
+      {
+        "x": 100.0,
+        "y": 400.0
+      },
+      {
+        "x": 66.66666666666666,
+        "y": 416.6666666666667
+      },
+      {
+        "x": 166.66666666666669,
+        "y": 300.0
+      },
+      {
+        "x": 200.0,
+        "y": 216.66666666666666
+      },
+      {
+        "x": 66.66666666666666,
+        "y": 366.66666666666663
+      },
+      {
+        "x": 66.66666666666666,
+        "y": 400.0
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 266.66666666666663
+      },
+      {
+        "x": 66.66666666666666,
+        "y": 416.6666666666667
+      },
+      {
+        "x": 100.0,
+        "y": 450.0
+      },
+      {
+        "x": 33.33333333333333,
+        "y": 450.0
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 233.33333333333334
+      },
+      {
+        "x": 66.66666666666666,
+        "y": 350.0
+      },
+      {
+        "x": 33.33333333333333,
+        "y": 416.6666666666667
+      },
+      {
+        "x": 166.66666666666669,
+        "y": 300.0
+      },
+      {
+        "x": 33.33333333333333,
+        "y": 433.3333333333333
+      },
+      {
+        "x": 100.0,
+        "y": 383.33333333333337
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 350.0
+      },
+      {
+        "x": 233.33333333333334,
+        "y": 266.66666666666663
+      },
+      {
+        "x": 100.0,
+        "y": 333.33333333333337
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 383.33333333333337
+      },
+      {
+        "x": 200.0,
+        "y": 233.33333333333334
+      },
+      {
+        "x": 100.0,
+        "y": 316.66666666666663
+      },
+      {
+        "x": 100.0,
+        "y": 316.66666666666663
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 383.33333333333337
+      },
+      {
+        "x": 100.0,
+        "y": 383.33333333333337
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 350.0
+      },
+      {
+        "x": 66.66666666666666,
+        "y": 400.0
+      },
+      {
+        "x": 100.0,
+        "y": 366.66666666666663
+      },
+      {
+        "x": 0.0,
+        "y": 316.66666666666663
+      },
+      {
+        "x": 200.0,
+        "y": 266.66666666666663
+      },
+      {
+        "x": 166.66666666666669,
+        "y": 250.0
+      },
+      {
+        "x": 100.0,
+        "y": 383.33333333333337
+      },
+      {
+        "x": 266.66666666666663,
+        "y": 166.66666666666669
+      },
+      {
+        "x": 200.0,
+        "y": 233.33333333333334
+      },
+      {
+        "x": 100.0,
+        "y": 350.0
+      },
+      {
+        "x": 66.66666666666666,
+        "y": 283.33333333333337
+      },
+      {
+        "x": 33.33333333333333,
+        "y": 350.0
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 283.33333333333337
+      },
+      {
+        "x": 166.66666666666669,
+        "y": 283.33333333333337
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 333.33333333333337
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 333.33333333333337
+      },
+      {
+        "x": 200.0,
+        "y": 350.0
+      },
+      {
+        "x": 133.33333333333331,
+        "y": 333.33333333333337
+      }
+    ]
+  },
+  "content_distribution": {
+    "labels": [
+      "Educational",
+      "Promotional",
+      "Personal Story",
+      "Industry Insights",
+      "Product Showcase",
+      "Behind Scenes",
+      "Testimonials",
+      "Trending Topics"
+    ],
+    "data": [
+      305,
+      104,
+      142,
+      250,
+      104,
+      142,
+      104,
+      133
+    ],
+    "percentages": [
+      23.8,
+      8.1,
+      11.1,
+      19.5,
+      8.1,
+      11.1,
+      8.1,
+      10.4
+    ]
+  },
+  "brand_evolution": {
+    "labels": [
+      "Q1",
+      "Q2",
+      "Q3",
+      "Q4",
+      "Recent"
+    ],
+    "datasets": [
+      {
+        "label": "Educational",
+        "data": [
+          0,
+          0,
+          0,
+          0,
+          100.0
+        ]
+      },
+      {
+        "label": "Promotional",
+        "data": [
+          0,
+          0,
+          0,
+          0,
+          29.5
+        ]
+      },
+      {
+        "label": "Personal Story",
+        "data": [
+          0,
+          0,
+          0,
+          0,
+          52.5
+        ]
+      },
+      {
+        "label": "Industry Insights",
+        "data": [
+          0,
+          0,
+          0,
+          0,
+          59.0
+        ]
+      }
+    ]
+  },
+  "risk_indicators": {
+    "labels": [
+      "Over Promotion",
+      "Authenticity Gaps",
+      "Audience Disconnect",
+      "Controversial Content"
+    ],
+    "data": [
+      34.1,
+      129.8,
+      203.3,
+      9.2
+    ],
+    "colors": [
+      "#ff6b6b",
+      "#ff6b6b",
+      "#ff6b6b",
+      "#6bcf7f"
+    ]
+  },
+  "engagement_evolution": {
+    "datasets": [
+      {
+        "label": "Historical",
+        "data": [
+          {
+            "x": NaN,
+            "y": NaN,
+            "r": 0.0
+          }
+        ]
+      },
+      {
+        "label": "Recent",
+        "data": [
+          {
+            "x": 291.8032786885246,
+            "y": 337.7049180327869,
+            "r": 6.1
+          }
+        ]
+      }
+    ]
+  },
+  "kpi_benchmarks": {
+    "labels": [
+      "Authenticity",
+      "Follower Growth Catalyst",
+      "Expertise Demonstration",
+      "Trust Building",
+      "Audience Engagement"
+    ],
+    "actual": [
+      83.6,
+      50.9,
+      80.5,
+      77.0,
+      54.3
+    ],
+    "benchmarks": [
+      80,
+      70,
+      85,
+      75,
+      65
+    ]
+  },
+  "acquisition_readiness": {
+    "labels": [
+      "Trust Building",
+      "Value Delivery",
+      "Social Proof",
+      "Content Quality",
+      "Conversion Optimization"
+    ],
+    "data": [
+      80.3,
+      77.0,
+      64.8,
+      63.2,
+      63.0
+    ]
+  }
+};
+        
+        // Chart configurations and initialization
+        
+        // Chart 1: Growth Metrics Trend Analysis
+        if (chartData.growth_metrics_trend && chartData.growth_metrics_trend.labels) {
+            const ctx1 = document.getElementById('growthTrendChart').getContext('2d');
+            new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: chartData.growth_metrics_trend.labels,
+                    datasets: [
+                        {
+                            label: 'Historical',
+                            data: chartData.growth_metrics_trend.historical,
+                            backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 2
+                        },
+                        {
+                            label: 'Recent',
+                            data: chartData.growth_metrics_trend.recent,
+                            backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Historical vs Recent Performance'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                afterLabel: function(context) {
+                                    const index = context.dataIndex;
+                                    const change = chartData.growth_metrics_trend.changes[index];
+                                    return `Change: ${change > 0 ? '+' : ''}${change}%`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'Score (0-100)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        
+        // Chart 2: Brand & Growth Correlation Matrix
+        if (chartData.correlation_matrix && chartData.correlation_matrix.labels) {
+            const ctx2 = document.getElementById('correlationChart').getContext('2d');
+            
+            // Transform correlation data for heatmap
+            const heatmapData = [];
+            chartData.correlation_matrix.data.forEach((row, i) => {
+                row.forEach((value, j) => {
+                    heatmapData.push({
+                        x: chartData.correlation_matrix.labels[j],
+                        y: chartData.correlation_matrix.labels[i],
+                        v: value
+                    });
+                });
+            });
+            
+            new Chart(ctx2, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Correlation',
+                        data: heatmapData,
+                        backgroundColor: function(context) {
+                            const value = context.parsed.v;
+                            const alpha = Math.abs(value);
+                            return value > 0 ? `rgba(75, 192, 192, ${alpha})` : `rgba(255, 99, 132, ${alpha})`;
+                        },
+                        pointRadius: 15
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                title: function(context) {
+                                    return `${context[0].parsed.y} vs ${context[0].parsed.x}`;
+                                },
+                                label: function(context) {
+                                    return `Correlation: ${context.parsed.v.toFixed(3)}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'category',
+                            labels: chartData.correlation_matrix.labels,
+                            title: { display: true, text: 'Metrics' }
+                        },
+                        y: {
+                            type: 'category',
+                            labels: chartData.correlation_matrix.labels,
+                            title: { display: true, text: 'Metrics' }
+                        }
+                    }
+                }
+            });
+        }
+        
+        
+        // Chart 3: Customer Acquisition Traits Radar
+        if (chartData.acquisition_radar && chartData.acquisition_radar.labels) {
+            const ctx3 = document.getElementById('acquisitionRadarChart').getContext('2d');
+            new Chart(ctx3, {
+                type: 'radar',
+                data: {
+                    labels: chartData.acquisition_radar.labels,
+                    datasets: [
+                        {
+                            label: 'Current Performance',
+                            data: chartData.acquisition_radar.data,
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 2,
+                            pointBackgroundColor: 'rgba(54, 162, 235, 1)'
+                        },
+                        {
+                            label: 'Optimal Range',
+                            data: chartData.acquisition_radar.benchmarks,
+                            backgroundColor: 'rgba(255, 206, 86, 0.1)',
+                            borderColor: 'rgba(255, 206, 86, 1)',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            pointBackgroundColor: 'rgba(255, 206, 86, 1)'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                stepSize: 20
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        
+        // Chart 4: Brand Growth Evolution Timeline
+        if (chartData.evolution_timeline && chartData.evolution_timeline.labels) {
+            const ctx4 = document.getElementById('evolutionTimelineChart').getContext('2d');
+            new Chart(ctx4, {
+                type: 'line',
+                data: {
+                    labels: chartData.evolution_timeline.labels,
+                    datasets: chartData.evolution_timeline.datasets.map((dataset, index) => ({
+                        label: dataset.label,
+                        data: dataset.data,
+                        borderColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)', 'rgba(75, 192, 192, 1)'][index],
+                        backgroundColor: ['rgba(255, 99, 132, 0.1)', 'rgba(54, 162, 235, 0.1)', 'rgba(75, 192, 192, 0.1)'][index],
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }))
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Evolution Over Time Periods'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'Score (0-100)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        
+        // Chart 5: Personal Brand Personality Profile
+        if (chartData.personality_profile && chartData.personality_profile.labels) {
+            const ctx5 = document.getElementById('personalityProfileChart').getContext('2d');
+            new Chart(ctx5, {
+                type: 'polarArea',
+                data: {
+                    labels: chartData.personality_profile.labels,
+                    datasets: [{
+                        data: chartData.personality_profile.data,
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.6)',
+                            'rgba(54, 162, 235, 0.6)',
+                            'rgba(255, 206, 86, 0.6)',
+                            'rgba(75, 192, 192, 0.6)',
+                            'rgba(153, 102, 255, 0.6)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                stepSize: 20
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        
+        // Chart 6: Growth vs Brand Risk Analysis
+        if (chartData.risk_vs_growth && chartData.risk_vs_growth.data) {
+            const ctx6 = document.getElementById('riskGrowthScatterChart').getContext('2d');
+            new Chart(ctx6, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Content Posts',
+                        data: chartData.risk_vs_growth.data,
+                        backgroundColor: function(context) {
+                            const point = context.parsed;
+                            if (point.x < 30 && point.y > 70) return 'rgba(75, 192, 192, 0.6)'; // Low risk, high growth
+                            if (point.x > 70 && point.y < 30) return 'rgba(255, 99, 132, 0.6)'; // High risk, low growth
+                            return 'rgba(255, 206, 86, 0.6)'; // Medium
+                        },
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 2,
+                        pointRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Risk vs Growth Opportunity Matrix'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Brand Risk Score'
+                            },
+                            min: 0,
+                            max: 100
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Growth Opportunity Score'
+                            },
+                            min: 0,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+        
+        
+        // Chart 7: Content Strategy Distribution
+        if (chartData.content_distribution && chartData.content_distribution.labels) {
+            const ctx7 = document.getElementById('contentDistributionChart').getContext('2d');
+            new Chart(ctx7, {
+                type: 'doughnut',
+                data: {
+                    labels: chartData.content_distribution.labels,
+                    datasets: [{
+                        data: chartData.content_distribution.data,
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.8)',
+                            'rgba(54, 162, 235, 0.8)',
+                            'rgba(255, 206, 86, 0.8)',
+                            'rgba(75, 192, 192, 0.8)',
+                            'rgba(153, 102, 255, 0.8)',
+                            'rgba(255, 159, 64, 0.8)',
+                            'rgba(199, 199, 199, 0.8)',
+                            'rgba(83, 102, 255, 0.8)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const percentage = chartData.content_distribution.percentages[context.dataIndex];
+                                    return `${context.label}: ${context.parsed} posts (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        
+        // Chart 8: Brand Evolution Over Time
+        if (chartData.brand_evolution && chartData.brand_evolution.labels) {
+            const ctx8 = document.getElementById('brandEvolutionChart').getContext('2d');
+            new Chart(ctx8, {
+                type: 'line',
+                data: {
+                    labels: chartData.brand_evolution.labels,
+                    datasets: chartData.brand_evolution.datasets.map((dataset, index) => ({
+                        label: dataset.label,
+                        data: dataset.data,
+                        borderColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)', 'rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)'][index],
+                        backgroundColor: ['rgba(255, 99, 132, 0.1)', 'rgba(54, 162, 235, 0.1)', 'rgba(75, 192, 192, 0.1)', 'rgba(153, 102, 255, 0.1)'][index],
+                        borderWidth: 2,
+                        fill: false,
+                        tension: 0.4
+                    }))
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Content Category Evolution'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'Percentage (%)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        
+        // Chart 9: Brand Risk Indicators
+        if (chartData.risk_indicators && chartData.risk_indicators.labels) {
+            const ctx9 = document.getElementById('riskIndicatorsChart').getContext('2d');
+            new Chart(ctx9, {
+                type: 'bar',
+                data: {
+                    labels: chartData.risk_indicators.labels,
+                    datasets: [{
+                        label: 'Risk Percentage',
+                        data: chartData.risk_indicators.data,
+                        backgroundColor: chartData.risk_indicators.colors,
+                        borderColor: chartData.risk_indicators.colors.map(color => color.replace('0.6', '1')),
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Behavioral Risk Assessment'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'Risk Percentage (%)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        
+        // Chart 10: Audience Engagement Evolution
+        if (chartData.engagement_evolution && chartData.engagement_evolution.datasets) {
+            const ctx10 = document.getElementById('engagementEvolutionChart').getContext('2d');
+            new Chart(ctx10, {
+                type: 'bubble',
+                data: {
+                    datasets: chartData.engagement_evolution.datasets.map((dataset, index) => ({
+                        label: dataset.label,
+                        data: dataset.data,
+                        backgroundColor: index === 0 ? 'rgba(255, 99, 132, 0.6)' : 'rgba(54, 162, 235, 0.6)',
+                        borderColor: index === 0 ? 'rgba(255, 99, 132, 1)' : 'rgba(54, 162, 235, 1)',
+                        borderWidth: 2
+                    }))
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Engagement vs Conversion Evolution'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Audience Engagement Score'
+                            },
+                            min: 0,
+                            max: 100
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Conversion Intent Score'
+                            },
+                            min: 0,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+        
+        
+        // Chart 11: Growth KPIs vs Industry Benchmarks
+        if (chartData.kpi_benchmarks && chartData.kpi_benchmarks.labels) {
+            const ctx11 = document.getElementById('benchmarkRadarChart').getContext('2d');
+            new Chart(ctx11, {
+                type: 'radar',
+                data: {
+                    labels: chartData.kpi_benchmarks.labels,
+                    datasets: [
+                        {
+                            label: 'Your Performance',
+                            data: chartData.kpi_benchmarks.actual,
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 3,
+                            pointBackgroundColor: 'rgba(54, 162, 235, 1)',
+                            pointRadius: 6
+                        },
+                        {
+                            label: 'Industry Benchmark',
+                            data: chartData.kpi_benchmarks.benchmarks,
+                            backgroundColor: 'rgba(255, 206, 86, 0.1)',
+                            borderColor: 'rgba(255, 206, 86, 1)',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            pointBackgroundColor: 'rgba(255, 206, 86, 1)',
+                            pointRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                stepSize: 20
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        
+        // Chart 12: Customer Acquisition Readiness Breakdown
+        if (chartData.acquisition_readiness && chartData.acquisition_readiness.labels) {
+            const ctx12 = document.getElementById('acquisitionReadinessChart').getContext('2d');
+            new Chart(ctx12, {
+                type: 'doughnut',
+                data: {
+                    labels: chartData.acquisition_readiness.labels,
+                    datasets: [{
+                        data: chartData.acquisition_readiness.data,
+                        backgroundColor: [
+                            'rgba(75, 192, 192, 0.8)',
+                            'rgba(54, 162, 235, 0.8)',
+                            'rgba(255, 206, 86, 0.8)',
+                            'rgba(153, 102, 255, 0.8)',
+                            'rgba(255, 99, 132, 0.8)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Readiness Component Breakdown'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.label}: ${context.parsed}% ready`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        
+    </script>
+</body>
+</html>
+        

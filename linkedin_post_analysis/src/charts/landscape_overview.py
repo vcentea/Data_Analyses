@@ -296,10 +296,10 @@ def create_topic_analysis(df):
     
     return fig, top_topics, topic_engagement
 
-def generate_landscape_overview():
+def generate_landscape_overview(data_file: str = None):
     """Generate complete landscape overview analysis"""
     print("🔄 Loading data for landscape overview...")
-    df = load_and_merge_data()
+    df = load_and_merge_data(data_file)
     summary = get_data_summary(df)
     
     print("📊 Creating comprehensive dashboard...")

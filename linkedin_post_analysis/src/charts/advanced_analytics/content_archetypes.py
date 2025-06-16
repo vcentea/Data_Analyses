@@ -343,10 +343,10 @@ def create_archetype_distribution_chart(cluster_labels, archetype_labels):
     
     return fig
 
-def generate_content_archetypes():
+def generate_content_archetypes(data_file: str = None):
     """Generate complete content archetype discovery analysis"""
     print("Loading data for content archetype discovery...")
-    df = load_and_merge_data()
+    df = load_and_merge_data(data_file)
     
     print("Preparing clustering data...")
     X_scaled, trait_cols, scaler = prepare_clustering_data(df)
