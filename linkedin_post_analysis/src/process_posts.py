@@ -1,14 +1,61 @@
 #!/usr/bin/env python3
 import os, sys, json, pandas as pd, requests
 import argparse
+from dotenv import load_dotenv
 
-# ─── CONFIG ───────────────────────────────────────────────────────────────────
-OUTPUT_FILE = "results.jsonl"       # will be created/appended
-BASE_URL    = "http://localhost:1234/v1"  # LM Studio OpenAI-compat server
-MODEL       = "qwen3-32b"       # e.g. "llama-3.2-1b-instruct" or "gpt-4o-mini"
-TEMPERATURE = 0.2
-MAX_TOKENS  = 14096
-# ────────────────────────────────────────────────────────────────────────────────
+# Load configuration
+try:
+    # Try to load from environment file first
+    if os.path.exists('config.env'):
+        load_dotenv('config.env')
+    elif os.path.exists('../config.env'):
+        load_dotenv('../config.env')
+        
+    # Import from config.py, allowing environment variables to override
+    try:
+        from config import (
+            OUTPUT_FILE as DEFAULT_OUTPUT_FILE,
+            BASE_URL as DEFAULT_BASE_URL,
+            API_KEY as DEFAULT_API_KEY,
+            MODEL as DEFAULT_MODEL,
+            TEMPERATURE as DEFAULT_TEMPERATURE,
+            MAX_TOKENS as DEFAULT_MAX_TOKENS,
+            REQUEST_TIMEOUT as DEFAULT_REQUEST_TIMEOUT,
+            CONNECTION_TIMEOUT as DEFAULT_CONNECTION_TIMEOUT
+        )
+    except ImportError:
+        # Try importing from parent directory
+        sys.path.append('..')
+        from config import (
+            OUTPUT_FILE as DEFAULT_OUTPUT_FILE,
+            BASE_URL as DEFAULT_BASE_URL,
+            API_KEY as DEFAULT_API_KEY,
+            MODEL as DEFAULT_MODEL,
+            TEMPERATURE as DEFAULT_TEMPERATURE,
+            MAX_TOKENS as DEFAULT_MAX_TOKENS,
+            REQUEST_TIMEOUT as DEFAULT_REQUEST_TIMEOUT,
+            CONNECTION_TIMEOUT as DEFAULT_CONNECTION_TIMEOUT
+        )
+    
+    # Use environment variables if available, otherwise use config.py defaults
+    OUTPUT_FILE = os.getenv('OUTPUT_FILE', DEFAULT_OUTPUT_FILE)
+    BASE_URL = os.getenv('BASE_URL', DEFAULT_BASE_URL)
+    API_KEY = os.getenv('API_KEY', DEFAULT_API_KEY)
+    MODEL = os.getenv('MODEL', DEFAULT_MODEL)
+    TEMPERATURE = float(os.getenv('TEMPERATURE', DEFAULT_TEMPERATURE))
+    MAX_TOKENS = int(os.getenv('MAX_TOKENS', DEFAULT_MAX_TOKENS))
+    REQUEST_TIMEOUT = int(os.getenv('REQUEST_TIMEOUT', DEFAULT_REQUEST_TIMEOUT))
+    CONNECTION_TIMEOUT = int(os.getenv('CONNECTION_TIMEOUT', DEFAULT_CONNECTION_TIMEOUT))
+    
+except ImportError:
+    print("[ERROR] config.py not found. Please create config.py with your settings.")
+    sys.exit(1)
+
+print(f"🔧 Configuration loaded:")
+print(f"   Output file: {OUTPUT_FILE}")
+print(f"   API endpoint: {BASE_URL}")
+print(f"   Model: {MODEL}")
+print(f"   API key: {'Set' if API_KEY else 'Not set (local model)'}")
 
 # Token tracking globals
 total_input_tokens = 0
@@ -86,6 +133,10 @@ Respond with _only_ the JSON object.
 
 CHAT_ENDPOINT = f"{BASE_URL}/chat/completions"
 HEADERS = {"Content-Type": "application/json"}
+
+# Add API key to headers if provided
+if API_KEY:
+    HEADERS["Authorization"] = f"Bearer {API_KEY}"
 
 
 def parse_arguments():
@@ -168,7 +219,7 @@ def call_llm(post_text):
         "temperature": TEMPERATURE,
         "max_tokens":  MAX_TOKENS
     }
-    r = requests.post(CHAT_ENDPOINT, headers=HEADERS, json=payload, timeout=300)
+    r = requests.post(CHAT_ENDPOINT, headers=HEADERS, json=payload, timeout=REQUEST_TIMEOUT)
     r.raise_for_status()
     resp = r.json()
     raw_response = resp["choices"][0]["message"]["content"]
@@ -222,14 +273,17 @@ def main():
     
     done_ids = load_done_ids(args.output)
     
-    # Test LM Studio connection
+    # Test API connection
     try:
-        test_response = requests.get(f"{BASE_URL}/models", timeout=10)
+        test_response = requests.get(f"{BASE_URL}/models", headers=HEADERS if API_KEY else {}, timeout=CONNECTION_TIMEOUT)
         test_response.raise_for_status()
-        print(f"✅ Connected to LM Studio at {BASE_URL}")
+        print(f"✅ Connected to API at {BASE_URL}")
     except requests.exceptions.RequestException as e:
-        print(f"[ERROR] Cannot connect to LM Studio at {BASE_URL}: {e}")
-        print("Make sure LM Studio is running and the server is started.")
+        print(f"[ERROR] Cannot connect to API at {BASE_URL}: {e}")
+        if not API_KEY:
+            print("Make sure LM Studio is running and the server is started.")
+        else:
+            print("Check your API key and endpoint configuration.")
         sys.exit(1)
 
     total_posts = len(posts_data)
