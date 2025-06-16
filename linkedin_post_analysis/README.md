@@ -80,7 +80,10 @@ linkedin_post_analysis/
 │   │   ├── engagement_analysis.py    # Engagement patterns
 │   │   ├── trend_analysis.py         # Predictive trends
 │   │   └── personality_profile.py    # Profile analysis
-│   └── process_posts.py              # LLM processing script
+│   ├── process_posts.py              # LLM processing script
+│   ├── config.py                     # Configuration settings
+│   ├── config.env.template           # Configuration template
+│   └── requirements.txt              # Python dependencies
 ├── 📈 data/                          # Data files
 │   ├── [dataset].jsonl              # LLM analysis results
 │   ├── [dataset].xlsx               # Source data
@@ -99,7 +102,8 @@ linkedin_post_analysis/
 - **Scikit-learn**: Machine learning models (clustering, regression, classification)
 - **NetworkX**: Network analysis for topic relationships
 - **SciPy**: Statistical analysis and trend detection
-- **LM Studio**: Local LLM processing
+- **Python-dotenv**: Environment configuration management
+- **LLM Integration**: Local LM Studio, OpenAI, OpenRouter, Azure OpenAI
 - **HTML/CSS/JavaScript**: Report interfaces
 
 ## 🔧 Enhanced Data Loading System
@@ -119,6 +123,45 @@ python src/charts/generate_all.py data/vlad_results.jsonl
 # Works with Excel or CSV
 python src/charts/generate_all.py data/dataset.xlsx
 python src/charts/generate_all.py data/dataset.csv
+```
+
+## ⚙️ Configuration Management
+
+### External Configuration System
+- **Modular Configuration**: Settings separated from source code
+- **Environment Support**: Use `.env` files for sensitive data
+- **Multi-Provider Support**: Local LM Studio, OpenAI, OpenRouter, Azure
+- **API Key Security**: Protected from git commits via .gitignore
+- **Flexible Override**: Environment variables override config files
+
+### Configuration Files
+- **`config.py`**: Main configuration with defaults
+- **`config.env.template`**: Template for user customization
+- **`config.env`**: User's private configuration (not tracked in git)
+- **`requirements.txt`**: All Python dependencies including python-dotenv
+
+### Supported LLM Providers
+- **Local LM Studio**: No API key required, localhost endpoint
+- **OpenAI**: GPT-4, GPT-3.5 models with API key
+- **OpenRouter**: Access to multiple models via single API
+- **Azure OpenAI**: Enterprise-grade OpenAI deployment
+
+### Configuration Examples
+```bash
+# Local LM Studio (default)
+BASE_URL=http://localhost:1234/v1
+API_KEY=
+MODEL=qwen3-32b
+
+# OpenAI
+BASE_URL=https://api.openai.com/v1
+API_KEY=sk-your-openai-key
+MODEL=gpt-4o-mini
+
+# OpenRouter
+BASE_URL=https://openrouter.ai/api/v1
+API_KEY=sk-or-v1-your-key
+MODEL=anthropic/claude-3-sonnet
 ```
 
 ## 📊 Comprehensive Metrics Analyzed
@@ -199,7 +242,8 @@ python src/charts/generate_all.py data/dataset.csv
 ### Prerequisites
 ```bash
 python 3.11+
-pip install plotly pandas numpy scikit-learn networkx scipy openpyxl
+pip install -r requirements.txt
+# OR manually install: pip install plotly pandas numpy scikit-learn networkx scipy openpyxl python-dotenv
 ```
 
 ### Installation
@@ -207,6 +251,23 @@ pip install plotly pandas numpy scikit-learn networkx scipy openpyxl
 git clone https://github.com/vcentea/Data_Analyses.git
 cd Data_Analyses/linkedin_post_analysis
 ```
+
+### Configuration Setup
+
+**For LLM Post Processing (Optional):**
+```bash
+# Copy configuration template
+cp src/config.env.template src/config.env
+
+# Edit config.env with your settings:
+# - For local LM Studio: keep API_KEY empty
+# - For cloud providers: add your API key
+```
+
+**Configuration Options:**
+- **Local LM Studio**: `BASE_URL=http://localhost:1234/v1`, `API_KEY=` (empty)
+- **OpenAI**: `BASE_URL=https://api.openai.com/v1`, `API_KEY=sk-your-key`
+- **OpenRouter**: `BASE_URL=https://openrouter.ai/api/v1`, `API_KEY=sk-or-v1-your-key`
 
 ### Running Complete Analysis
 ```bash
@@ -217,6 +278,15 @@ python src/charts/generate_all.py data/your_results.jsonl
 python src/charts/topic_analysis.py data/your_results.jsonl
 python src/charts/engagement_analysis.py data/your_results.jsonl
 python src/charts/trend_analysis.py data/your_results.jsonl
+```
+
+### LLM Post Processing (Optional)
+```bash
+# Process posts with LLM for personality analysis
+python src/process_posts.py your_posts.xlsx
+
+# With custom output file
+python src/process_posts.py your_posts.xlsx -o custom_results.jsonl
 ```
 
 ### Viewing Reports

@@ -14,8 +14,9 @@ A sophisticated AI-powered analysis system that processes LinkedIn posts through
 - **AI-Powered Intelligence**: Topic authority, engagement patterns, and future trend predictions
 - **Machine Learning Models**: Clustering, regression, network analysis, and predictive modeling
 - **Real Data Processing**: No dummy data - requires actual data files with smart companion detection
+- **Flexible LLM Integration**: Support for local and cloud providers with secure configuration management
 
-**Technologies:** Python, Plotly, Scikit-learn, NetworkX, SciPy, LM Studio
+**Technologies:** Python, Plotly, Scikit-learn, NetworkX, SciPy, Python-dotenv, Multi-LLM Support
 
 [📂 View LinkedIn Analysis Documentation](linkedin_post_analysis/README.md)
 
