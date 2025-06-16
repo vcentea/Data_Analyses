@@ -1,3 +1,40 @@
+# Data Analyses Repository
+
+This repository contains comprehensive data analysis tools and systems for content intelligence and LLM integration.
+
+## 🚀 Projects
+
+### 1. LinkedIn Post Analysis - Comprehensive Intelligence System
+
+A sophisticated AI-powered analysis system that processes LinkedIn posts through a comprehensive 13-phase framework to extract personality traits, behavioral patterns, content intelligence insights, and predictive analytics.
+
+**Key Features:**
+- **13-Phase Analysis Framework** with 30+ metrics tracking
+- **13 Interactive HTML Reports** with professional dashboards
+- **AI-Powered Intelligence**: Topic authority, engagement patterns, and future trend predictions
+- **Machine Learning Models**: Clustering, regression, network analysis, and predictive modeling
+- **Real Data Processing**: No dummy data - requires actual data files with smart companion detection
+
+**Technologies:** Python, Plotly, Scikit-learn, NetworkX, SciPy, LM Studio
+
+[📂 View LinkedIn Analysis Documentation](linkedin_post_analysis/README.md)
+
+### 2. API Control for Excel - LLM Integration
+
+A powerful VBA script that enables seamless integration between Excel and Large Language Models (LLMs) with intelligent API call management and automatic monitoring.
+
+**Key Features:**
+- **Excel UDF Integration**: Use `=LLM("your prompt")` directly in Excel cells
+- **Smart Caching**: Avoid duplicate API calls with intelligent result caching
+- **Configurable Limits**: Set maximum API call limits to control usage
+- **Multiple LLM Support**: Compatible with LM Studio, OpenAI, OpenRouter, and more
+
+**Technologies:** VBA, Excel, LLM APIs
+
+[📂 View API Control Documentation](#api-control-for-excel---llm-integration)
+
+---
+
 # API Control for Excel - LLM Integration
 
 A powerful VBA script that enables seamless integration between Excel and Large Language Models (LLMs) with intelligent API call management and automatic monitoring.
