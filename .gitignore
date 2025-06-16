@@ -1,0 +1,95 @@
+# Environment and Configuration Files
+config.env
+.env
+*.env
+
+# API Keys and Secrets
+api_keys.txt
+secrets.txt
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+venv_*/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Data files (large files that shouldn't be in git)
+*.xlsx
+*.xls
+*.csv
+*.jsonl
+*.json
+results.*
+output.*
+data/raw/*
+data/processed/*
+!data/.gitkeep
+
+# Analysis outputs
+analysis_*/
+charts/
+reports/
+*.html
+*.png
+*.jpg
+*.jpeg
+*.pdf
+
+# Logs
+*.log
+logs/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+temp/
+tmp/
+*.tmp
+*.temp
+
+# Backup files
+*.bak
+*.backup
+*~ 
