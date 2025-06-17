@@ -1,0 +1,294 @@
+{
+  "name": "Analyzing posts at scale",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -20,
+        -140
+      ],
+      "id": "057390a0-8283-429a-afe6-b5cb455d61a3",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1hd8vNX41nOOR8tAmd_Wm3jRSAXAwokaM04bQnP8IoBM/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1hd8vNX41nOOR8tAmd_Wm3jRSAXAwokaM04bQnP8IoBM/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        220,
+        -140
+      ],
+      "id": "aedfc602-45c6-485e-bfe2-928ec137d5d4",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "aem5ZeZSRcovGPwp",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Add a new field called 'myNewField' to the JSON of the item\n$input.item.json.myNewField = 1;\n\nreturn $input.item;"
+      },
+      "id": "1c7b584c-b9cd-480d-a697-7454d1bb9b3a",
+      "name": "Prepare Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        460,
+        -140
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        680,
+        -140
+      ],
+      "id": "74b663cf-d3eb-465f-90c4-6984cd89f92e",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "qwen3-32b",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "You are an organisational psychologist specialising in digital psychometrics.\nEvaluate the LinkedIn post provided by the USER and return ONLY valid JSON that follows the exact schema shown below.\n\nCRITICAL: Your response must contain ONLY the JSON object. No explanations, no markdown formatting, no extra text whatsoever.\n\n\nScoring rules (1 very low → 5 very high).\n\n────────────────────────────────────────\nTopic-tag categories (controlled vocab)\n────────────────────────────────────────\nChoose up to **three** categories that fit the post and list them in the\n\"topic_tags\" array (JSON list of strings). If none apply, use [\"Other\"].\n\n- \"AI technical deep dive\"    (algorithms, LLM internals, code)\n- \"AI tools & workflows\"     (applications, prompts, use-cases)\n- \"Prompt engineering\"      (prompt craft, guard-rails, best-practices)\n- \"LinkedIn growth strategy\"   (content pillars, audience building)\n- \"LinkedIn automation\"     (scraping, APIs, DM sequences, growth hacks)\n- \"SaaS product strategy\"    (pricing, GTM, roadmap, metrics)\n- \"SaaS engineering & integr.\"  (architecture, MLOps, MCP, APIs)\n- \"Growth marketing\"       (funnels, paid/organic, CRO)\n- \"Personal branding\"      (storytelling, visibility, career narrative)\n- \"Leadership & culture\"     (team, vision, values)\n- \"Entrepreneurship & funding\"  (fund-raise, equity, exits, finance)\n- \"Productivity & learning\"   (workflows, study hacks, tooling)\n- \"Other\"\n\n────────────────────────────────────────\nSCHEMA:\n{\n \"topic_tags\": [ \"\" ],     // ≤3 strings from the list above\n \"big_five\": {\n  \"openness\": <int 1-5>,\n  \"conscientiousness\": <int 1-5>,\n  \"extraversion\": <int 1-5>,\n  \"agreeableness\": <int 1-5>,\n  \"neuroticism\": <int 1-5>\n },\n \"partner_traits\": {\n  \"integrity_trust\":  <int 1-5>,\n  \"reliability\":    <int 1-5>,\n  \"collaboration\":   <int 1-5>,\n  \"adaptability\":   <int 1-5>,\n  \"risk_tolerance\":  <int 1-5>,\n  \"strategic_thinking\": <int 1-5>,\n  \"leadership\":    <int 1-5>\n },\n \"flags\": {\n  \"self_promotion\":   <boolean>,\n  \"humility\":      <boolean>,\n  \"controversial\":   <boolean>,\n  \"aggressive_language\": <boolean>\n },\n \"evidence\": {\n  \"integrity_trust\":  \"<string>\",\n  \"reliability\":    \"<string>\",\n  \"collaboration\":   \"<string>\",\n  \"adaptability\":   \"<string>\",\n  \"risk_tolerance\":  \"<string>\",\n  \"strategic_thinking\": \"<string>\",\n  \"leadership\":    \"<string>\"\n }\n}\n\nRespond with _only_ the JSON object.\nstart your answer with the curly bracket of the json directly \"{\", nothing else in front of it.",
+              "role": "system"
+            },
+            {
+              "content": "=<post>\n\n{{ $json.post_text }}\n\n</post>"
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        980,
+        -120
+      ],
+      "id": "18fd1ec1-dd33-451d-8401-ee095ca75961",
+      "name": "OpenAI",
+      "executeOnce": false,
+      "credentials": {
+        "openAiApi": {
+          "id": "UXsyT8a07XmC4Vhy",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse AI response and flatten the structure\nconst item = $input.first();\nconst aiResponse = item.json.message.content;\n\n// Get the post_number from the current input data (it should be passed through)\nconst postNumber = item.json.post_number || 'unknown';\n\ntry {\n  // Clean the response - remove thinking blocks and extract JSON\n  let cleanedResponse = aiResponse.trim();\n  \n  // Remove <think>...</think> blocks (including multiline)\n  cleanedResponse = cleanedResponse.replace(/<think>[\\s\\S]*?<\\/think>\\s*/gi, '');\n  \n  // Remove any markdown formatting\n  if (cleanedResponse.startsWith('```json')) {\n    cleanedResponse = cleanedResponse.replace(/```json\\s*/, '').replace(/```\\s*$/, '');\n  }\n  if (cleanedResponse.startsWith('```')) {\n    cleanedResponse = cleanedResponse.replace(/```\\s*/, '').replace(/```\\s*$/, '');\n  }\n  \n  // Extract JSON object - find first { and matching }\n  const firstBrace = cleanedResponse.indexOf('{');\n  if (firstBrace === -1) {\n    throw new Error('No JSON object found in response');\n  }\n  \n  let braceCount = 0;\n  let jsonEnd = -1;\n  \n  for (let i = firstBrace; i < cleanedResponse.length; i++) {\n    if (cleanedResponse[i] === '{') {\n      braceCount++;\n    } else if (cleanedResponse[i] === '}') {\n      braceCount--;\n      if (braceCount === 0) {\n        jsonEnd = i;\n        break;\n      }\n    }\n  }\n  \n  if (jsonEnd === -1) {\n    throw new Error('Incomplete JSON object found in response');\n  }\n  \n  cleanedResponse = cleanedResponse.substring(firstBrace, jsonEnd + 1).trim();\n  \n  const analysis = JSON.parse(cleanedResponse);\n  \n  // Flatten the nested structure for Google Sheets\n  const flattenedData = {\n    post_number: postNumber,\n    topic_tags: analysis.topic_tags ? analysis.topic_tags.join(', ') : '',\n    // Big Five traits\n    openness: analysis.big_five?.openness || 0,\n    conscientiousness: analysis.big_five?.conscientiousness || 0,\n    extraversion: analysis.big_five?.extraversion || 0,\n    agreeableness: analysis.big_five?.agreeableness || 0,\n    neuroticism: analysis.big_five?.neuroticism || 0,\n    // Partner traits\n    integrity_trust: analysis.partner_traits?.integrity_trust || 0,\n    reliability: analysis.partner_traits?.reliability || 0,\n    collaboration: analysis.partner_traits?.collaboration || 0,\n    adaptability: analysis.partner_traits?.adaptability || 0,\n    risk_tolerance: analysis.partner_traits?.risk_tolerance || 0,\n    strategic_thinking: analysis.partner_traits?.strategic_thinking || 0,\n    leadership: analysis.partner_traits?.leadership || 0,\n    // Flags\n    self_promotion: analysis.flags?.self_promotion || false,\n    humility: analysis.flags?.humility || false,\n    controversial: analysis.flags?.controversial || false,\n    aggressive_language: analysis.flags?.aggressive_language || false\n  };\n  \n  return [{ json: flattenedData }];\n  \n} catch (error) {\n  console.error('Failed to parse AI response:', error);\n  console.error('Raw response:', aiResponse);\n  \n  // Return error data with post_number\n  return [{\n    json: {\n      post_number: postNumber,\n      error: 'Failed to parse AI response',\n      raw_response: aiResponse\n    }\n  }];\n}"
+      },
+      "id": "51a37d0c-6d68-4b3e-865e-66eb75568e66",
+      "name": "Parse & Flatten Response1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1380,
+        -120
+      ],
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "append",
+        "documentId": "YOUR_OUTPUT_SPREADSHEET_ID",
+        "sheetName": "Analysis Results",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {}
+        },
+        "options": {}
+      },
+      "id": "0c8ea308-3448-4408-b012-613fb1c17f88",
+      "name": "Write to Output Sheet1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        2480,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "amount": 2,
+        "unit": "seconds"
+      },
+      "id": "2f63b635-fc45-4cab-8e4d-ddfc3424fdcd",
+      "name": "Rate Limit Delay1",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [
+        2300,
+        620
+      ],
+      "webhookId": "ad1f2fd1-236d-45d8-84d4-0ba861edbe54"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1BVFMs8x04JR-dnU3Ax4E08U17DsQ4jY5wSVD42vBX-g/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1BVFMs8x04JR-dnU3Ax4E08U17DsQ4jY5wSVD42vBX-g/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1620,
+        -120
+      ],
+      "id": "ff448479-a531-43ca-8469-ced3c5b7b2a1",
+      "name": "Google Sheets1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "aem5ZeZSRcovGPwp",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Prepare Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Data": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse & Flatten Response1": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Parse & Flatten Response1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "9fadde96-6220-4336-9aa5-b69abf075361",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a8857fe3bb042a7e3e59271e27b02da0b59a8affaaa1bbc373002233658b61cf"
+  },
+  "id": "QN1lVvT17HouRw7d",
+  "tags": []
+}
